@@ -1,0 +1,4 @@
+packages:
+  - packages/fhevm-sdk
+  - packages/veil-interface
+  # packages/smart-contract được loại bỏ để chạy độc lập với npm
