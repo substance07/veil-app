@@ -87,6 +87,11 @@ export function useDecrypt() {
       setError(null);
 
       try {
+        // DEMO MODE: Auto return true
+        console.log('🔓 [DEMO MODE] publicDecryptEbool auto returning true for handle:', handleBytes32);
+        return true;
+        
+        /* Original implementation commented out for demo
         const instance = options?.instance || relayerInstance;
         const result = await instance.publicDecrypt([handleBytes32]);
         const value = getDecryptedValue(result, handleBytes32);
@@ -96,6 +101,7 @@ export function useDecrypt() {
         }
 
         return Boolean(value);
+        */
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Public decrypt ebool failed";
         setError(errorMessage);
@@ -128,6 +134,11 @@ export function useDecrypt() {
       setError(null);
 
       try {
+        // DEMO MODE: Auto return 1n
+        console.log('🔓 [DEMO MODE] publicDecryptEuint auto returning 1n for handle:', handleBytes32);
+        return BigInt(1);
+        
+        /* Original implementation commented out for demo
         const instance = options?.instance || relayerInstance;
         const result = await instance.publicDecrypt([handleBytes32]);
         const value = getDecryptedValue(result, handleBytes32);
@@ -137,6 +148,7 @@ export function useDecrypt() {
         }
 
         return BigInt(value as number | bigint);
+        */
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Public decrypt euint failed";
         setError(errorMessage);
@@ -169,6 +181,11 @@ export function useDecrypt() {
       setError(null);
 
       try {
+        // DEMO MODE: Auto return fake address
+        console.log('🔓 [DEMO MODE] publicDecryptEaddress auto returning fake address for handle:', handleBytes32);
+        return "0x0000000000000000000000000000000000000001";
+        
+        /* Original implementation commented out for demo
         const instance = options?.instance || relayerInstance;
         const result = await instance.publicDecrypt([handleBytes32]);
         const value = getDecryptedValue(result, handleBytes32);
@@ -185,6 +202,7 @@ export function useDecrypt() {
           return `0x${value.toString(16).padStart(40, "0")}`;
         }
         throw new Error("Invalid address format");
+        */
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Public decrypt eaddress failed";
         setError(errorMessage);
@@ -518,6 +536,12 @@ export function useDecrypt() {
       setError(null);
 
       try {
+        // DEMO MODE: Auto return 1
+        const handles = Array.isArray(handle) ? handle : [handle];
+        console.log('🔓 [DEMO MODE] decrypt (legacy) auto returning 1 for handles:', handles);
+        return 1;
+        
+        /* Original implementation commented out for demo
         const handles = Array.isArray(handle) ? handle : [handle];
         const result = await relayerInstance.publicDecrypt(handles);
         const clearValues = (result as any).clearValues || result;
@@ -529,6 +553,7 @@ export function useDecrypt() {
         }
 
         return decryptedValue as boolean | number | bigint;
+        */
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Decryption failed";
         setError(errorMessage);

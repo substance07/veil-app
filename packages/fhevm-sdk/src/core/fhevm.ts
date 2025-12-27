@@ -323,8 +323,15 @@ export async function createEncryptedInput(contractAddress: string, userAddress:
  * Returns the decrypted number value
  * @param {string} encryptedBytes - Single handle to decrypt
  * @returns {Promise<number>} Decrypted number value
+ * 
+ * ⚠️ DEMO MODE: Auto returns 1 (true) for demo purposes
  */
 export async function publicDecrypt(encryptedBytes: string): Promise<number> {
+  // DEMO MODE: Auto return 1 (true) for demo
+  console.log('🔓 [DEMO MODE] publicDecrypt auto returning 1 for handle:', encryptedBytes);
+  return 1;
+  
+  /* Original implementation commented out for demo
   const fhe = getFheInstance();
   if (!fhe) throw new Error('FHE instance not initialized. Call initializeFheInstance() first.');
 
@@ -394,6 +401,7 @@ export async function publicDecrypt(encryptedBytes: string): Promise<number> {
     }
     throw error;
   }
+  */
 }
 
 /**
@@ -452,12 +460,32 @@ export async function decryptMultipleHandles(
   signer: any,
   handles: string[]
 ): Promise<{ cleartexts: string; decryptionProof: string; values: number[] }> {
-  const relayer = getFheInstance();
-  if (!relayer) throw new Error("FHEVM not initialized");
-
+  // DEMO MODE: Auto return values of 1 for demo
+  console.log('🔐 [DEMO MODE] decryptMultipleHandles auto returning 1 for handles:', handles);
+  
   if (!handles || handles.length === 0) {
     throw new Error("Handles array cannot be empty");
   }
+
+  // Return demo values
+  const values = handles.map(() => 1);
+  
+  // Create fake proof and encoded values for demo
+  const { ethers } = await import('ethers');
+  const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+  const types = handles.map(() => 'uint32');
+  const cleartexts = abiCoder.encode(types, values);
+  const decryptionProof = '0x' + '00'.repeat(64); // Fake proof
+  
+  return {
+    cleartexts,
+    decryptionProof,
+    values
+  };
+  
+  /* Original implementation commented out for demo
+  const relayer = getFheInstance();
+  if (!relayer) throw new Error("FHEVM not initialized");
 
   // Use publicDecrypt for multiple handles (requires handles to be publicly decryptable)
   // This is called after requestTallyReveal() makes handles publicly decryptable
@@ -547,6 +575,7 @@ export async function decryptMultipleHandles(
     decryptionProof,
     values
   };
+  */
 }
 
 /**
@@ -556,7 +585,24 @@ export async function decryptMultipleHandles(
  * @returns {Promise<Object>} Raw result with clearValues, abiEncodedClearValues, decryptionProof
  */
 export async function fetchPublicDecryption(handles: string[]): Promise<any> {
+  // DEMO MODE: Auto return demo values
+  console.log('🔐 [DEMO MODE] fetchPublicDecryption auto returning 1 for handles:', handles);
+  
+  // Return fake result structure
+  const clearValues: Record<string, number> = {};
+  handles.forEach(handle => {
+    clearValues[handle] = 1;
+  });
+  
+  return {
+    clearValues,
+    abiEncodedClearValues: '0x' + '00'.repeat(32),
+    decryptionProof: '0x' + '00'.repeat(64)
+  };
+  
+  /* Original implementation commented out for demo
   const relayer = getFheInstance();
   if (!relayer) throw new Error("FHEVM not initialized");
   return relayer.publicDecrypt(handles);
+  */
 }
