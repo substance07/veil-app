@@ -22,7 +22,3 @@ export {
   type FhevmPublicDecryptOptions,
 } from "./useFheDecrypt";
 export { getFheInstance, useFheInstance } from "./useFheInstance";
-
-// Deprecated: useZamaRelayerInstance - use useFheInstance instead
-// Kept for backward compatibility, but will be removed in the future
-export { default as useZamaRelayerInstance } from "./useZamaRelayerInstance";
