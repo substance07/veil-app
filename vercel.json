@@ -1,6 +1,5 @@
 {
   "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter ./packages/veil-interface build",
-  "outputDirectory": "packages/veil-interface/.next",
   "installCommand": "pnpm install --frozen-lockfile"
 }
 
