@@ -47,7 +47,7 @@
     "next:serve": "pnpm --filter ./packages/nextjs serve",
     "precommit": "lint-staged",
     "preinstall": "pnpm sdk:build",
-    "start": "pnpm --filter ./packages/nextjs dev",
+    "start": "pnpm --filter ./packages/veil-interface dev",
     "test": "pnpm hardhat:test",
     "test:showcases": "pnpm test:react && pnpm test:nextjs && pnpm test:vue",
     "test:react": "pnpm --filter ./packages/react-showcase test",
