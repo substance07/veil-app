@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import type { VeilWhitelist } from "@/web3/contracts"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useState } from "react";
+import type { VeilWhitelist } from "@/web3/contracts";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface CreateCampaignProps {
-  writeContract: VeilWhitelist | null
-  isConnected: boolean
-  contractAddress: string | undefined
-  onCampaignCreated: (campaignId: number) => void
-  onMessage: (message: string) => void
+  writeContract: VeilWhitelist | null;
+  isConnected: boolean;
+  contractAddress: string | undefined;
+  onCampaignCreated: (campaignId: number) => void;
+  onMessage: (message: string) => void;
 }
 
 export function CreateCampaign({
@@ -19,54 +19,54 @@ export function CreateCampaign({
   onCampaignCreated,
   onMessage,
 }: CreateCampaignProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [newCampaignName, setNewCampaignName] = useState<string>("")
-  const [isCreatingCampaign, setIsCreatingCampaign] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [newCampaignName, setNewCampaignName] = useState<string>("");
+  const [isCreatingCampaign, setIsCreatingCampaign] = useState(false);
 
   const createCampaign = async () => {
-    if (!isConnected || !writeContract || !newCampaignName.trim() || !contractAddress) return
+    if (!isConnected || !writeContract || !newCampaignName.trim() || !contractAddress) return;
 
     try {
-      setIsCreatingCampaign(true)
-      onMessage("Creating campaign...")
+      setIsCreatingCampaign(true);
+      onMessage("Creating campaign...");
 
-      const tx = await writeContract.createCampaign(newCampaignName.trim())
-      onMessage("Waiting for confirmation...")
-      const receipt = await tx.wait()
+      const tx = await writeContract.createCampaign(newCampaignName.trim());
+      onMessage("Waiting for confirmation...");
+      const receipt = await tx.wait();
 
       // Get the campaign ID from events
       const campaignCreatedEvent = receipt.logs.find((log: any) => {
         try {
-          const parsed = writeContract.interface.parseLog(log)
-          return parsed?.name === "CampaignCreated"
+          const parsed = writeContract.interface.parseLog(log);
+          return parsed?.name === "CampaignCreated";
         } catch {
-          return false
+          return false;
         }
-      })
+      });
 
-      let newCampaignId = 0
+      let newCampaignId = 0;
       if (campaignCreatedEvent) {
         try {
-          const parsed = writeContract.interface.parseLog(campaignCreatedEvent)
-          newCampaignId = Number(parsed?.args.campaignId)
+          const parsed = writeContract.interface.parseLog(campaignCreatedEvent);
+          newCampaignId = Number(parsed?.args.campaignId);
         } catch (err) {
-          console.error("Failed to parse campaign ID from event:", err)
+          console.error("Failed to parse campaign ID from event:", err);
         }
       }
 
-      onMessage(`Campaign "${newCampaignName.trim()}" created successfully!`)
-      setNewCampaignName("")
-      onCampaignCreated(newCampaignId)
-      setIsOpen(false)
+      onMessage(`Campaign "${newCampaignName.trim()}" created successfully!`);
+      setNewCampaignName("");
+      onCampaignCreated(newCampaignId);
+      setIsOpen(false);
 
-      setTimeout(() => onMessage(""), 3000)
+      setTimeout(() => onMessage(""), 3000);
     } catch (error: any) {
-      console.error("Create campaign failed:", error)
-      onMessage("Failed to create campaign")
+      console.error("Create campaign failed:", error);
+      onMessage("Failed to create campaign");
     } finally {
-      setIsCreatingCampaign(false)
+      setIsCreatingCampaign(false);
     }
-  }
+  };
 
   return (
     <>
@@ -106,7 +106,7 @@ export function CreateCampaign({
                 disabled={isCreatingCampaign}
                 onKeyPress={(e) => {
                   if (e.key === "Enter" && !isCreatingCampaign && newCampaignName.trim()) {
-                    createCampaign()
+                    createCampaign();
                   }
                 }}
                 autoFocus
@@ -160,5 +160,5 @@ export function CreateCampaign({
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

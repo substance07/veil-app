@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import useWeb3 from "@/lib/hooks/useWeb3"
-import { useFhevm } from "@/lib/hooks"
-import { MainNav } from "@/components/layout/MainNav"
-import { FheWhitelist } from "@/components/features/veil/FheWhitelist"
+import { useEffect, useState } from "react";
+import useWeb3 from "@/lib/hooks/useWeb3";
+import { useFhevm } from "@/lib/hooks";
+import { MainNav } from "@/components/layout/MainNav";
+import { FheWhitelist } from "@/components/features/veil/FheWhitelist";
 
 export default function VeilCampaignManagementPage() {
-  const [message, setMessage] = useState<string>("")
+  const [message, setMessage] = useState<string>("");
 
-  const { address: account, chainId, isConnected } = useWeb3()
-  const { status: fhevmStatus, initialize: initializeFhevm, error: fhevmError } = useFhevm()
+  const { address: account, chainId, isConnected } = useWeb3();
+  const { status: fhevmStatus, initialize: initializeFhevm, error: fhevmError } = useFhevm();
 
   useEffect(() => {
     if (isConnected && fhevmStatus === "idle") {
-      initializeFhevm()
+      initializeFhevm();
     }
-  }, [isConnected, fhevmStatus, initializeFhevm])
+  }, [isConnected, fhevmStatus, initializeFhevm]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,5 +57,5 @@ export default function VeilCampaignManagementPage() {
         />
       </main>
     </div>
-  )
+  );
 }

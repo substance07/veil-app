@@ -6,11 +6,11 @@ let sdkInitialized = false;
 export type FhevmStatus = "idle" | "initializing" | "ready" | "error";
 
 /**
- * @deprecated This hook has been deprecated. 
+ * @deprecated This hook has been deprecated.
  * Use `useFheInstance()` from `@/lib/hooks` or `useFhevm()` from `@fhevm-sdk` instead.
- * 
+ *
  * This hook still works for backward compatibility, but will be removed in the future.
- * 
+ *
  * Migration:
  * - Replace `useZamaRelayerInstance()` with `useFheInstance()` or `useFhevm().instance`
  */
@@ -20,7 +20,7 @@ export default function useZamaRelayerInstance() {
   if (sdkInstance) {
     return sdkInstance;
   }
-  
+
   // Fallback to old implementation if @fhevm-sdk hasn't been initialized
   const { data, isLoading, isError, error, status } = useQuery({
     queryKey: ["zamaRelayerInstance"],

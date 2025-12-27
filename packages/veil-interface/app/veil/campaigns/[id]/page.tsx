@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import { use, useMemo, useState } from "react"
-import { useFhevm } from "@/lib/hooks"
-import { CheckWhitelistPublic } from "@/components/features/veil/CheckWhitelistPublic"
-import Link from "next/link"
-import WalletButton from "@/components/common/WalletButton/index"
+import { use, useMemo, useState } from "react";
+import { useFhevm } from "@/lib/hooks";
+import { CheckWhitelistPublic } from "@/components/features/veil/CheckWhitelistPublic";
+import Link from "next/link";
+import WalletButton from "@/components/common/WalletButton/index";
 
 export default function VeilCampaignCheckPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params)
-  const campaignId = useMemo(() => Number(resolvedParams.id), [resolvedParams.id])
-  const [message, setMessage] = useState<string>("")
+  const resolvedParams = use(params);
+  const campaignId = useMemo(() => Number(resolvedParams.id), [resolvedParams.id]);
+  const [message, setMessage] = useState<string>("");
 
-  const { status: fhevmStatus, initialize: initializeFhevm, error: fhevmError } = useFhevm()
+  const { status: fhevmStatus, initialize: initializeFhevm, error: fhevmError } = useFhevm();
 
   if (fhevmStatus === "idle") {
-    initializeFhevm()
+    initializeFhevm();
   }
 
-  const targetChainId = 11155111
+  const targetChainId = 11155111;
 
   return (
     <div className="min-h-screen bg-background">
@@ -88,5 +88,5 @@ export default function VeilCampaignCheckPage({ params }: { params: Promise<{ id
         )}
       </main>
     </div>
-  )
+  );
 }

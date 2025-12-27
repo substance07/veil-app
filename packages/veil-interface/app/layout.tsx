@@ -1,11 +1,11 @@
-import type React from "react"
-import Providers from "@/components/Providers"
-import { Toaster } from "@/components/ui/sonner"
-import { generateMetadata } from "@/lib/utils/seo"
-import { Analytics } from "@vercel/analytics/react"
-import type { Metadata } from "next"
-import Script from "next/script"
-import "./globals.css"
+import type React from "react";
+import Providers from "@/components/Providers";
+import { Toaster } from "@/components/ui/sonner";
+import { generateMetadata } from "@/lib/utils/seo";
+import { Analytics } from "@vercel/analytics/react";
+import type { Metadata } from "next";
+import Script from "next/script";
+import "./globals.css";
 
 export const metadata: Metadata = {
   ...generateMetadata(),
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
     default: "Veil Whitelist – Encrypted Whitelist for Campaigns",
     template: "%s | Veil Whitelist",
   },
-    generator: 'v0.app'
-}
+  generator: "v0.app",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -59,5 +59,5 @@ export default function RootLayout({
         />
       </body>
     </html>
-  )
+  );
 }

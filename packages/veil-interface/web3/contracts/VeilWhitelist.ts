@@ -53,137 +53,46 @@ export interface VeilWhitelistInterface extends Interface {
       | "WhitelistRemoved"
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "addWhitelist",
-    values: [BigNumberish, BytesLike[], BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "campaignCount",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "campaigns",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "checkAccessAll",
-    values: [BigNumberish, BytesLike, BytesLike]
-  ): string;
+  encodeFunctionData(functionFragment: "addWhitelist", values: [BigNumberish, BytesLike[], BytesLike]): string;
+  encodeFunctionData(functionFragment: "campaignCount", values?: undefined): string;
+  encodeFunctionData(functionFragment: "campaigns", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "checkAccessAll", values: [BigNumberish, BytesLike, BytesLike]): string;
   encodeFunctionData(
     functionFragment: "checkAccessRange",
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "clearWhitelist",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "confidentialProtocolId",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "createCampaign",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getCampaignInfo",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getEncryptedWhitelistAt",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMyLastCheck",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isCampaignOwner",
-    values: [BigNumberish, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeWhitelistAt",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeWhitelistBatch",
-    values: [BigNumberish, BigNumberish[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferCampaignOwnership",
-    values: [BigNumberish, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "wlSize",
-    values: [BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: "clearWhitelist", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "confidentialProtocolId", values?: undefined): string;
+  encodeFunctionData(functionFragment: "createCampaign", values: [string]): string;
+  encodeFunctionData(functionFragment: "getCampaignInfo", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "getEncryptedWhitelistAt", values: [BigNumberish, BigNumberish]): string;
+  encodeFunctionData(functionFragment: "getMyLastCheck", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "isCampaignOwner", values: [BigNumberish, AddressLike]): string;
+  encodeFunctionData(functionFragment: "removeWhitelistAt", values: [BigNumberish, BigNumberish]): string;
+  encodeFunctionData(functionFragment: "removeWhitelistBatch", values: [BigNumberish, BigNumberish[]]): string;
+  encodeFunctionData(functionFragment: "transferCampaignOwnership", values: [BigNumberish, AddressLike]): string;
+  encodeFunctionData(functionFragment: "wlSize", values: [BigNumberish]): string;
 
-  decodeFunctionResult(
-    functionFragment: "addWhitelist",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "campaignCount",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "addWhitelist", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "campaignCount", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "campaigns", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "checkAccessAll",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "checkAccessRange",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "clearWhitelist",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "confidentialProtocolId",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "createCampaign",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getCampaignInfo",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getEncryptedWhitelistAt",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMyLastCheck",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isCampaignOwner",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeWhitelistAt",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeWhitelistBatch",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferCampaignOwnership",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "checkAccessAll", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "checkAccessRange", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "clearWhitelist", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "confidentialProtocolId", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "createCampaign", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getCampaignInfo", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getEncryptedWhitelistAt", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getMyLastCheck", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isCampaignOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "removeWhitelistAt", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "removeWhitelistBatch", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "transferCampaignOwnership", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "wlSize", data: BytesLike): Result;
 }
 
 export namespace CampaignCreatedEvent {
-  export type InputTuple = [
-    campaignId: BigNumberish,
-    owner: AddressLike,
-    name: string
-  ];
+  export type InputTuple = [campaignId: BigNumberish, owner: AddressLike, name: string];
   export type OutputTuple = [campaignId: bigint, owner: string, name: string];
   export interface OutputObject {
     campaignId: bigint;
@@ -197,16 +106,8 @@ export namespace CampaignCreatedEvent {
 }
 
 export namespace CampaignOwnershipTransferredEvent {
-  export type InputTuple = [
-    campaignId: BigNumberish,
-    prevOwner: AddressLike,
-    newOwner: AddressLike
-  ];
-  export type OutputTuple = [
-    campaignId: bigint,
-    prevOwner: string,
-    newOwner: string
-  ];
+  export type InputTuple = [campaignId: BigNumberish, prevOwner: AddressLike, newOwner: AddressLike];
+  export type OutputTuple = [campaignId: bigint, prevOwner: string, newOwner: string];
   export interface OutputObject {
     campaignId: bigint;
     prevOwner: string;
@@ -273,31 +174,21 @@ export interface VeilWhitelist extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  on<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     listener: TypedListener<TCEvent>
   ): Promise<this>;
 
-  once<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     listener: TypedListener<TCEvent>
   ): Promise<this>;
 
-  listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent
-  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
-  removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
-  ): Promise<this>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
 
   addWhitelist: TypedContractMethod<
     [campaignId: BigNumberish, addrsCt: BytesLike[], attestation: BytesLike],
@@ -314,7 +205,7 @@ export interface VeilWhitelist extends BaseContract {
         owner: string;
         exists: boolean;
         name: string;
-      }
+      },
     ],
     "view"
   >;
@@ -326,22 +217,12 @@ export interface VeilWhitelist extends BaseContract {
   >;
 
   checkAccessRange: TypedContractMethod<
-    [
-      campaignId: BigNumberish,
-      userAddrCt: BytesLike,
-      attestation: BytesLike,
-      start: BigNumberish,
-      end: BigNumberish
-    ],
+    [campaignId: BigNumberish, userAddrCt: BytesLike, attestation: BytesLike, start: BigNumberish, end: BigNumberish],
     [string],
     "nonpayable"
   >;
 
-  clearWhitelist: TypedContractMethod<
-    [campaignId: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+  clearWhitelist: TypedContractMethod<[campaignId: BigNumberish], [void], "nonpayable">;
 
   confidentialProtocolId: TypedContractMethod<[], [bigint], "view">;
 
@@ -355,40 +236,20 @@ export interface VeilWhitelist extends BaseContract {
         exists: boolean;
         name: string;
         whitelistSize: bigint;
-      }
+      },
     ],
     "view"
   >;
 
-  getEncryptedWhitelistAt: TypedContractMethod<
-    [campaignId: BigNumberish, i: BigNumberish],
-    [string],
-    "view"
-  >;
+  getEncryptedWhitelistAt: TypedContractMethod<[campaignId: BigNumberish, i: BigNumberish], [string], "view">;
 
-  getMyLastCheck: TypedContractMethod<
-    [campaignId: BigNumberish],
-    [string],
-    "view"
-  >;
+  getMyLastCheck: TypedContractMethod<[campaignId: BigNumberish], [string], "view">;
 
-  isCampaignOwner: TypedContractMethod<
-    [campaignId: BigNumberish, account: AddressLike],
-    [boolean],
-    "view"
-  >;
+  isCampaignOwner: TypedContractMethod<[campaignId: BigNumberish, account: AddressLike], [boolean], "view">;
 
-  removeWhitelistAt: TypedContractMethod<
-    [campaignId: BigNumberish, index: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+  removeWhitelistAt: TypedContractMethod<[campaignId: BigNumberish, index: BigNumberish], [void], "nonpayable">;
 
-  removeWhitelistBatch: TypedContractMethod<
-    [campaignId: BigNumberish, indices: BigNumberish[]],
-    [void],
-    "nonpayable"
-  >;
+  removeWhitelistBatch: TypedContractMethod<[campaignId: BigNumberish, indices: BigNumberish[]], [void], "nonpayable">;
 
   transferCampaignOwnership: TypedContractMethod<
     [campaignId: BigNumberish, newOwner: AddressLike],
@@ -398,9 +259,7 @@ export interface VeilWhitelist extends BaseContract {
 
   wlSize: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
 
-  getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
-  ): T;
+  getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
 
   getFunction(
     nameOrSignature: "addWhitelist"
@@ -409,19 +268,15 @@ export interface VeilWhitelist extends BaseContract {
     [void],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "campaignCount"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "campaigns"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "campaignCount"): TypedContractMethod<[], [bigint], "view">;
+  getFunction(nameOrSignature: "campaigns"): TypedContractMethod<
     [arg0: BigNumberish],
     [
       [string, boolean, string] & {
         owner: string;
         exists: boolean;
         name: string;
-      }
+      },
     ],
     "view"
   >;
@@ -435,28 +290,14 @@ export interface VeilWhitelist extends BaseContract {
   getFunction(
     nameOrSignature: "checkAccessRange"
   ): TypedContractMethod<
-    [
-      campaignId: BigNumberish,
-      userAddrCt: BytesLike,
-      attestation: BytesLike,
-      start: BigNumberish,
-      end: BigNumberish
-    ],
+    [campaignId: BigNumberish, userAddrCt: BytesLike, attestation: BytesLike, start: BigNumberish, end: BigNumberish],
     [string],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "clearWhitelist"
-  ): TypedContractMethod<[campaignId: BigNumberish], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "confidentialProtocolId"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "createCampaign"
-  ): TypedContractMethod<[name: string], [bigint], "nonpayable">;
-  getFunction(
-    nameOrSignature: "getCampaignInfo"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "clearWhitelist"): TypedContractMethod<[campaignId: BigNumberish], [void], "nonpayable">;
+  getFunction(nameOrSignature: "confidentialProtocolId"): TypedContractMethod<[], [bigint], "view">;
+  getFunction(nameOrSignature: "createCampaign"): TypedContractMethod<[name: string], [bigint], "nonpayable">;
+  getFunction(nameOrSignature: "getCampaignInfo"): TypedContractMethod<
     [campaignId: BigNumberish],
     [
       [string, boolean, string, bigint] & {
@@ -464,51 +305,27 @@ export interface VeilWhitelist extends BaseContract {
         exists: boolean;
         name: string;
         whitelistSize: bigint;
-      }
+      },
     ],
     "view"
   >;
   getFunction(
     nameOrSignature: "getEncryptedWhitelistAt"
-  ): TypedContractMethod<
-    [campaignId: BigNumberish, i: BigNumberish],
-    [string],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getMyLastCheck"
-  ): TypedContractMethod<[campaignId: BigNumberish], [string], "view">;
+  ): TypedContractMethod<[campaignId: BigNumberish, i: BigNumberish], [string], "view">;
+  getFunction(nameOrSignature: "getMyLastCheck"): TypedContractMethod<[campaignId: BigNumberish], [string], "view">;
   getFunction(
     nameOrSignature: "isCampaignOwner"
-  ): TypedContractMethod<
-    [campaignId: BigNumberish, account: AddressLike],
-    [boolean],
-    "view"
-  >;
+  ): TypedContractMethod<[campaignId: BigNumberish, account: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "removeWhitelistAt"
-  ): TypedContractMethod<
-    [campaignId: BigNumberish, index: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+  ): TypedContractMethod<[campaignId: BigNumberish, index: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "removeWhitelistBatch"
-  ): TypedContractMethod<
-    [campaignId: BigNumberish, indices: BigNumberish[]],
-    [void],
-    "nonpayable"
-  >;
+  ): TypedContractMethod<[campaignId: BigNumberish, indices: BigNumberish[]], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "transferCampaignOwnership"
-  ): TypedContractMethod<
-    [campaignId: BigNumberish, newOwner: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "wlSize"
-  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+  ): TypedContractMethod<[campaignId: BigNumberish, newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(nameOrSignature: "wlSize"): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
 
   getEvent(
     key: "CampaignCreated"

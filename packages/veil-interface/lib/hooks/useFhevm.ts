@@ -1,23 +1,26 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useFhevm as useFhevmSDK } from "@fhevm-sdk"
+import { useEffect } from "react";
+import { useFhevm as useFhevmSDK } from "@fhevm-sdk";
 
-type FhevmStatus = "idle" | "initializing" | "ready" | "error"
+type FhevmStatus = "idle" | "initializing" | "ready" | "error";
 
 /**
  * Wrapper hook for compatibility with current API
  * Uses @fhevm-sdk internally
  */
 export function useFhevm() {
-  const { instance, status: sdkStatus, error: sdkError, initialize: sdkInitialize, isInitialized } = useFhevmSDK()
+  const { instance, status: sdkStatus, error: sdkError, initialize: sdkInitialize, isInitialized } = useFhevmSDK();
 
   // Map status from @fhevm-sdk to current status
-  const status: FhevmStatus = 
-    sdkStatus === "idle" ? "idle" :
-    sdkStatus === "loading" ? "initializing" :
-    sdkStatus === "ready" ? "ready" :
-    "error"
+  const status: FhevmStatus =
+    sdkStatus === "idle"
+      ? "idle"
+      : sdkStatus === "loading"
+        ? "initializing"
+        : sdkStatus === "ready"
+          ? "ready"
+          : "error";
 
   // Auto-initialize when wallet is connected
   useEffect(() => {
@@ -25,17 +28,17 @@ export function useFhevm() {
       // Wait a bit to ensure SDK has loaded
       const timer = setTimeout(() => {
         if (status === "idle") {
-          sdkInitialize()
+          sdkInitialize();
         }
-      }, 100)
-      return () => clearTimeout(timer)
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [status, sdkInitialize])
+  }, [status, sdkInitialize]);
 
   return {
     status,
     error: sdkError || null,
     initialize: sdkInitialize,
     instance, // Expose instance so other hooks can use it
-  }
+  };
 }

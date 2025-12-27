@@ -1,41 +1,38 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import { ethers } from "ethers"
-import type { Signer, AddressLike } from "ethers"
-import { useFheInstance } from "./useFheInstance"
+import { useState, useCallback } from "react";
+import { ethers } from "ethers";
+import type { Signer, AddressLike } from "ethers";
+import { useFheInstance } from "./useFheInstance";
 
 export type HandleContractPair = {
-  handle: string | Uint8Array
-  contractAddress: string
-}
+  handle: string | Uint8Array;
+  contractAddress: string;
+};
 
-export type FhevmTypeEuint = 8 | 16 | 32 | 64 | 128 | 256
+export type FhevmTypeEuint = 8 | 16 | 32 | 64 | 128 | 256;
 
 export type FhevmUserDecryptOptions = {
-  instance?: any
+  instance?: any;
   keypair?: {
-    publicKey: string
-    privateKey: string
-  }
+    publicKey: string;
+    privateKey: string;
+  };
   validity?: {
-    startTimestamp?: string | number
-    durationDays?: string | number
-  }
-}
+    startTimestamp?: string | number;
+    durationDays?: string | number;
+  };
+};
 
 export type FhevmPublicDecryptOptions = {
-  instance?: any
-}
+  instance?: any;
+};
 
 // Helper function to get value from decrypt result
-function getDecryptedValue(
-  result: any,
-  handle: string
-): boolean | number | bigint | string | null {
-  const clearValues = result.clearValues || result
-  const value = clearValues[handle]
-  return value !== null && value !== undefined ? value : null
+function getDecryptedValue(result: any, handle: string): boolean | number | bigint | string | null {
+  const clearValues = result.clearValues || result;
+  const value = clearValues[handle];
+  return value !== null && value !== undefined ? value : null;
 }
 
 // Helper function to create user decrypt signature
@@ -47,12 +44,7 @@ async function createUserDecryptSignature(
   startTimestamp: string | number,
   durationDays: string | number
 ): Promise<string> {
-  const eip712 = relayerInstance.createEIP712(
-    keypair.publicKey,
-    contractAddresses,
-    startTimestamp,
-    durationDays
-  )
+  const eip712 = relayerInstance.createEIP712(keypair.publicKey, contractAddresses, startTimestamp, durationDays);
 
   const signature = await signer.signTypedData(
     eip712.domain,
@@ -60,17 +52,17 @@ async function createUserDecryptSignature(
       UserDecryptRequestVerification: eip712.types.UserDecryptRequestVerification,
     },
     eip712.message
-  )
+  );
 
   // Signature không được có prefix "0x"
-  return signature.replace("0x", "")
+  return signature.replace("0x", "");
 }
 
 export function useDecrypt() {
-  const [isDecrypting, setIsDecrypting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isDecrypting, setIsDecrypting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   // Use instance from @fhevm-sdk
-  const relayerInstance = useFheInstance()
+  const relayerInstance = useFheInstance();
 
   // ========== Public Decrypt Methods ==========
 
@@ -78,141 +70,131 @@ export function useDecrypt() {
    * Public decrypt for boolean (ebool)
    */
   const publicDecryptEbool = useCallback(
-    async (
-      handleBytes32: string,
-      options?: FhevmPublicDecryptOptions
-    ): Promise<boolean> => {
+    async (handleBytes32: string, options?: FhevmPublicDecryptOptions): Promise<boolean> => {
       if (!relayerInstance) {
-        const errMsg = "FHE instance not initialized"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "FHE instance not initialized";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (typeof relayerInstance.publicDecrypt !== "function") {
-        const errMsg = "publicDecrypt method not available on FHE instance"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "publicDecrypt method not available on FHE instance";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
-      setIsDecrypting(true)
-      setError(null)
+      setIsDecrypting(true);
+      setError(null);
 
       try {
-        const instance = options?.instance || relayerInstance
-        const result = await instance.publicDecrypt([handleBytes32])
-        const value = getDecryptedValue(result, handleBytes32)
+        const instance = options?.instance || relayerInstance;
+        const result = await instance.publicDecrypt([handleBytes32]);
+        const value = getDecryptedValue(result, handleBytes32);
 
         if (value === null) {
-          throw new Error("Decryption returned null or undefined")
+          throw new Error("Decryption returned null or undefined");
         }
 
-        return Boolean(value)
+        return Boolean(value);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Public decrypt ebool failed"
-        setError(errorMessage)
-        throw err
+        const errorMessage = err instanceof Error ? err.message : "Public decrypt ebool failed";
+        setError(errorMessage);
+        throw err;
       } finally {
-        setIsDecrypting(false)
+        setIsDecrypting(false);
       }
     },
     [relayerInstance]
-  )
+  );
 
   /**
    * Public decrypt for unsigned integer (euint)
    */
   const publicDecryptEuint = useCallback(
-    async (
-      fhevmType: FhevmTypeEuint,
-      handleBytes32: string,
-      options?: FhevmPublicDecryptOptions
-    ): Promise<bigint> => {
+    async (fhevmType: FhevmTypeEuint, handleBytes32: string, options?: FhevmPublicDecryptOptions): Promise<bigint> => {
       if (!relayerInstance) {
-        const errMsg = "FHE instance not initialized"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "FHE instance not initialized";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (typeof relayerInstance.publicDecrypt !== "function") {
-        const errMsg = "publicDecrypt method not available on FHE instance"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "publicDecrypt method not available on FHE instance";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
-      setIsDecrypting(true)
-      setError(null)
+      setIsDecrypting(true);
+      setError(null);
 
       try {
-        const instance = options?.instance || relayerInstance
-        const result = await instance.publicDecrypt([handleBytes32])
-        const value = getDecryptedValue(result, handleBytes32)
+        const instance = options?.instance || relayerInstance;
+        const result = await instance.publicDecrypt([handleBytes32]);
+        const value = getDecryptedValue(result, handleBytes32);
 
         if (value === null) {
-          throw new Error("Decryption returned null or undefined")
+          throw new Error("Decryption returned null or undefined");
         }
 
-        return BigInt(value as number | bigint)
+        return BigInt(value as number | bigint);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Public decrypt euint failed"
-        setError(errorMessage)
-        throw err
+        const errorMessage = err instanceof Error ? err.message : "Public decrypt euint failed";
+        setError(errorMessage);
+        throw err;
       } finally {
-        setIsDecrypting(false)
+        setIsDecrypting(false);
       }
     },
     [relayerInstance]
-  )
+  );
 
   /**
    * Public decrypt for address (eaddress)
    */
   const publicDecryptEaddress = useCallback(
-    async (
-      handleBytes32: string,
-      options?: FhevmPublicDecryptOptions
-    ): Promise<string> => {
+    async (handleBytes32: string, options?: FhevmPublicDecryptOptions): Promise<string> => {
       if (!relayerInstance) {
-        const errMsg = "FHE instance not initialized"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "FHE instance not initialized";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (typeof relayerInstance.publicDecrypt !== "function") {
-        const errMsg = "publicDecrypt method not available on FHE instance"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "publicDecrypt method not available on FHE instance";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
-      setIsDecrypting(true)
-      setError(null)
+      setIsDecrypting(true);
+      setError(null);
 
       try {
-        const instance = options?.instance || relayerInstance
-        const result = await instance.publicDecrypt([handleBytes32])
-        const value = getDecryptedValue(result, handleBytes32)
+        const instance = options?.instance || relayerInstance;
+        const result = await instance.publicDecrypt([handleBytes32]);
+        const value = getDecryptedValue(result, handleBytes32);
 
         if (value === null) {
-          throw new Error("Decryption returned null or undefined")
+          throw new Error("Decryption returned null or undefined");
         }
 
         // Address có thể là string hoặc bytes32, chuyển về string
         if (typeof value === "string") {
-          return value
+          return value;
         }
         if (typeof value === "bigint" || typeof value === "number") {
-          return `0x${value.toString(16).padStart(40, "0")}`
+          return `0x${value.toString(16).padStart(40, "0")}`;
         }
-        throw new Error("Invalid address format")
+        throw new Error("Invalid address format");
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Public decrypt eaddress failed"
-        setError(errorMessage)
-        throw err
+        const errorMessage = err instanceof Error ? err.message : "Public decrypt eaddress failed";
+        setError(errorMessage);
+        throw err;
       } finally {
-        setIsDecrypting(false)
+        setIsDecrypting(false);
       }
     },
     [relayerInstance]
-  )
+  );
 
   // ========== User Decrypt Methods ==========
 
@@ -227,42 +209,42 @@ export function useDecrypt() {
       options?: FhevmUserDecryptOptions
     ): Promise<boolean> => {
       if (!relayerInstance) {
-        const errMsg = "FHE instance not initialized"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "FHE instance not initialized";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (typeof relayerInstance.userDecrypt !== "function") {
-        const errMsg = "userDecrypt method not available on FHE instance"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "userDecrypt method not available on FHE instance";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
-      setIsDecrypting(true)
-      setError(null)
+      setIsDecrypting(true);
+      setError(null);
 
       try {
-        const instance = options?.instance || relayerInstance
+        const instance = options?.instance || relayerInstance;
         // Resolve contractAddress to string
-        let contractAddr: string
+        let contractAddr: string;
         if (typeof contractAddress === "string") {
-          contractAddr = contractAddress
+          contractAddr = contractAddress;
         } else if (contractAddress && typeof contractAddress === "object" && "getAddress" in contractAddress) {
-          contractAddr = await contractAddress.getAddress()
+          contractAddr = await contractAddress.getAddress();
         } else {
-          contractAddr = String(contractAddress)
+          contractAddr = String(contractAddress);
         }
-        const userAddress = await user.getAddress()
+        const userAddress = await user.getAddress();
 
         // Generate or use keypair from options
-        const keypair = options?.keypair || instance.generateKeypair()
+        const keypair = options?.keypair || instance.generateKeypair();
 
         // Set validity từ options hoặc default
-        const validity = options?.validity || {}
-        const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString()
-        const durationDays = validity.durationDays || "1"
+        const validity = options?.validity || {};
+        const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString();
+        const durationDays = validity.durationDays || "1";
 
-        const contractAddresses: string[] = [contractAddr]
+        const contractAddresses: string[] = [contractAddr];
 
         // Create signature
         const signature = await createUserDecryptSignature(
@@ -272,7 +254,7 @@ export function useDecrypt() {
           keypair,
           startTimestamp,
           durationDays
-        )
+        );
 
         // Gọi userDecrypt
         const handleContractPairs: HandleContractPair[] = [
@@ -280,7 +262,7 @@ export function useDecrypt() {
             handle: handleBytes32,
             contractAddress: contractAddr,
           },
-        ]
+        ];
 
         const result = await instance.userDecrypt(
           handleContractPairs,
@@ -291,25 +273,25 @@ export function useDecrypt() {
           userAddress,
           startTimestamp,
           durationDays
-        )
+        );
 
-        const value = getDecryptedValue(result, handleBytes32)
+        const value = getDecryptedValue(result, handleBytes32);
 
         if (value === null) {
-          throw new Error("Decryption returned null or undefined")
+          throw new Error("Decryption returned null or undefined");
         }
 
-        return Boolean(value)
+        return Boolean(value);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "User decrypt ebool failed"
-        setError(errorMessage)
-        throw err
+        const errorMessage = err instanceof Error ? err.message : "User decrypt ebool failed";
+        setError(errorMessage);
+        throw err;
       } finally {
-        setIsDecrypting(false)
+        setIsDecrypting(false);
       }
     },
     [relayerInstance]
-  )
+  );
 
   /**
    * User decrypt for unsigned integer (euint)
@@ -323,42 +305,42 @@ export function useDecrypt() {
       options?: FhevmUserDecryptOptions
     ): Promise<bigint> => {
       if (!relayerInstance) {
-        const errMsg = "FHE instance not initialized"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "FHE instance not initialized";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (typeof relayerInstance.userDecrypt !== "function") {
-        const errMsg = "userDecrypt method not available on FHE instance"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "userDecrypt method not available on FHE instance";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
-      setIsDecrypting(true)
-      setError(null)
+      setIsDecrypting(true);
+      setError(null);
 
       try {
-        const instance = options?.instance || relayerInstance
+        const instance = options?.instance || relayerInstance;
         // Resolve contractAddress to string
-        let contractAddr: string
+        let contractAddr: string;
         if (typeof contractAddress === "string") {
-          contractAddr = contractAddress
+          contractAddr = contractAddress;
         } else if (contractAddress && typeof contractAddress === "object" && "getAddress" in contractAddress) {
-          contractAddr = await contractAddress.getAddress()
+          contractAddr = await contractAddress.getAddress();
         } else {
-          contractAddr = String(contractAddress)
+          contractAddr = String(contractAddress);
         }
-        const userAddress = await user.getAddress()
+        const userAddress = await user.getAddress();
 
         // Generate or use keypair from options
-        const keypair = options?.keypair || instance.generateKeypair()
+        const keypair = options?.keypair || instance.generateKeypair();
 
         // Set validity từ options hoặc default
-        const validity = options?.validity || {}
-        const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString()
-        const durationDays = validity.durationDays || "1"
+        const validity = options?.validity || {};
+        const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString();
+        const durationDays = validity.durationDays || "1";
 
-        const contractAddresses: string[] = [contractAddr]
+        const contractAddresses: string[] = [contractAddr];
 
         // Create signature
         const signature = await createUserDecryptSignature(
@@ -368,7 +350,7 @@ export function useDecrypt() {
           keypair,
           startTimestamp,
           durationDays
-        )
+        );
 
         // Gọi userDecrypt
         const handleContractPairs: HandleContractPair[] = [
@@ -376,7 +358,7 @@ export function useDecrypt() {
             handle: handleBytes32,
             contractAddress: contractAddr,
           },
-        ]
+        ];
 
         const result = await instance.userDecrypt(
           handleContractPairs,
@@ -387,25 +369,25 @@ export function useDecrypt() {
           userAddress,
           startTimestamp,
           durationDays
-        )
+        );
 
-        const value = getDecryptedValue(result, handleBytes32)
+        const value = getDecryptedValue(result, handleBytes32);
 
         if (value === null) {
-          throw new Error("Decryption returned null or undefined")
+          throw new Error("Decryption returned null or undefined");
         }
 
-        return BigInt(value as number | bigint)
+        return BigInt(value as number | bigint);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "User decrypt euint failed"
-        setError(errorMessage)
-        throw err
+        const errorMessage = err instanceof Error ? err.message : "User decrypt euint failed";
+        setError(errorMessage);
+        throw err;
       } finally {
-        setIsDecrypting(false)
+        setIsDecrypting(false);
       }
     },
     [relayerInstance]
-  )
+  );
 
   /**
    * User decrypt for address (eaddress)
@@ -418,42 +400,42 @@ export function useDecrypt() {
       options?: FhevmUserDecryptOptions
     ): Promise<string> => {
       if (!relayerInstance) {
-        const errMsg = "FHE instance not initialized"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "FHE instance not initialized";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (typeof relayerInstance.userDecrypt !== "function") {
-        const errMsg = "userDecrypt method not available on FHE instance"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "userDecrypt method not available on FHE instance";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
-      setIsDecrypting(true)
-      setError(null)
+      setIsDecrypting(true);
+      setError(null);
 
       try {
-        const instance = options?.instance || relayerInstance
+        const instance = options?.instance || relayerInstance;
         // Resolve contractAddress to string
-        let contractAddr: string
+        let contractAddr: string;
         if (typeof contractAddress === "string") {
-          contractAddr = contractAddress
+          contractAddr = contractAddress;
         } else if (contractAddress && typeof contractAddress === "object" && "getAddress" in contractAddress) {
-          contractAddr = await contractAddress.getAddress()
+          contractAddr = await contractAddress.getAddress();
         } else {
-          contractAddr = String(contractAddress)
+          contractAddr = String(contractAddress);
         }
-        const userAddress = await user.getAddress()
+        const userAddress = await user.getAddress();
 
         // Generate or use keypair from options
-        const keypair = options?.keypair || instance.generateKeypair()
+        const keypair = options?.keypair || instance.generateKeypair();
 
         // Set validity từ options hoặc default
-        const validity = options?.validity || {}
-        const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString()
-        const durationDays = validity.durationDays || "1"
+        const validity = options?.validity || {};
+        const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString();
+        const durationDays = validity.durationDays || "1";
 
-        const contractAddresses: string[] = [contractAddr]
+        const contractAddresses: string[] = [contractAddr];
 
         // Create signature
         const signature = await createUserDecryptSignature(
@@ -463,7 +445,7 @@ export function useDecrypt() {
           keypair,
           startTimestamp,
           durationDays
-        )
+        );
 
         // Gọi userDecrypt
         const handleContractPairs: HandleContractPair[] = [
@@ -471,7 +453,7 @@ export function useDecrypt() {
             handle: handleBytes32,
             contractAddress: contractAddr,
           },
-        ]
+        ];
 
         const result = await instance.userDecrypt(
           handleContractPairs,
@@ -482,32 +464,32 @@ export function useDecrypt() {
           userAddress,
           startTimestamp,
           durationDays
-        )
+        );
 
-        const value = getDecryptedValue(result, handleBytes32)
+        const value = getDecryptedValue(result, handleBytes32);
 
         if (value === null) {
-          throw new Error("Decryption returned null or undefined")
+          throw new Error("Decryption returned null or undefined");
         }
 
         // Address có thể là string hoặc bytes32, chuyển về string
         if (typeof value === "string") {
-          return value
+          return value;
         }
         if (typeof value === "bigint" || typeof value === "number") {
-          return `0x${value.toString(16).padStart(40, "0")}`
+          return `0x${value.toString(16).padStart(40, "0")}`;
         }
-        throw new Error("Invalid address format")
+        throw new Error("Invalid address format");
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "User decrypt eaddress failed"
-        setError(errorMessage)
-        throw err
+        const errorMessage = err instanceof Error ? err.message : "User decrypt eaddress failed";
+        setError(errorMessage);
+        throw err;
       } finally {
-        setIsDecrypting(false)
+        setIsDecrypting(false);
       }
     },
     [relayerInstance]
-  )
+  );
 
   // ========== Legacy Methods (for backward compatibility) ==========
 
@@ -521,42 +503,42 @@ export function useDecrypt() {
       signer?: any
     ): Promise<boolean | number | bigint | null> => {
       if (!relayerInstance) {
-        const errMsg = "FHE instance not initialized"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "FHE instance not initialized";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (typeof relayerInstance.publicDecrypt !== "function") {
-        const errMsg = "publicDecrypt method not available on FHE instance"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "publicDecrypt method not available on FHE instance";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
-      setIsDecrypting(true)
-      setError(null)
+      setIsDecrypting(true);
+      setError(null);
 
       try {
-        const handles = Array.isArray(handle) ? handle : [handle]
-        const result = await relayerInstance.publicDecrypt(handles)
-        const clearValues = (result as any).clearValues || result
-        const targetHandle = Array.isArray(handle) ? handle[0] : handle
-        const decryptedValue = clearValues[targetHandle]
+        const handles = Array.isArray(handle) ? handle : [handle];
+        const result = await relayerInstance.publicDecrypt(handles);
+        const clearValues = (result as any).clearValues || result;
+        const targetHandle = Array.isArray(handle) ? handle[0] : handle;
+        const decryptedValue = clearValues[targetHandle];
 
         if (decryptedValue === null || decryptedValue === undefined) {
-          throw new Error("Decryption returned null or undefined")
+          throw new Error("Decryption returned null or undefined");
         }
 
-        return decryptedValue as boolean | number | bigint
+        return decryptedValue as boolean | number | bigint;
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Decryption failed"
-        setError(errorMessage)
-        throw err
+        const errorMessage = err instanceof Error ? err.message : "Decryption failed";
+        setError(errorMessage);
+        throw err;
       } finally {
-        setIsDecrypting(false)
+        setIsDecrypting(false);
       }
     },
     [relayerInstance]
-  )
+  );
 
   /**
    * @deprecated Use userDecryptEbool, userDecryptEuint, or userDecryptEaddress instead
@@ -571,30 +553,30 @@ export function useDecrypt() {
       durationDays?: string | number
     ): Promise<Record<string, boolean | number | bigint | string>> => {
       if (!relayerInstance) {
-        const errMsg = "FHE instance not initialized"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "FHE instance not initialized";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (typeof relayerInstance.userDecrypt !== "function") {
-        const errMsg = "userDecrypt method not available on FHE instance"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "userDecrypt method not available on FHE instance";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
       if (!signer) {
-        const errMsg = "Signer is required for userDecrypt"
-        setError(errMsg)
-        throw new Error(errMsg)
+        const errMsg = "Signer is required for userDecrypt";
+        setError(errMsg);
+        throw new Error(errMsg);
       }
 
-      setIsDecrypting(true)
-      setError(null)
+      setIsDecrypting(true);
+      setError(null);
 
       try {
-        const keypair = relayerInstance.generateKeypair()
-        const startTimeStamp = startTimestamp || Math.floor(Date.now() / 1000).toString()
-        const duration = durationDays || "1"
+        const keypair = relayerInstance.generateKeypair();
+        const startTimeStamp = startTimestamp || Math.floor(Date.now() / 1000).toString();
+        const duration = durationDays || "1";
 
         const signature = await createUserDecryptSignature(
           relayerInstance,
@@ -603,7 +585,7 @@ export function useDecrypt() {
           keypair,
           startTimeStamp,
           duration
-        )
+        );
 
         const result = await relayerInstance.userDecrypt(
           handleContractPairs,
@@ -614,19 +596,19 @@ export function useDecrypt() {
           userAddress,
           startTimeStamp,
           duration
-        )
+        );
 
-        return result as Record<string, boolean | number | bigint | string>
+        return result as Record<string, boolean | number | bigint | string>;
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "User decryption failed"
-        setError(errorMessage)
-        throw err
+        const errorMessage = err instanceof Error ? err.message : "User decryption failed";
+        setError(errorMessage);
+        throw err;
       } finally {
-        setIsDecrypting(false)
+        setIsDecrypting(false);
       }
     },
     [relayerInstance]
-  )
+  );
 
   return {
     // Public decrypt methods
@@ -643,5 +625,5 @@ export function useDecrypt() {
     // State
     isDecrypting,
     error,
-  }
+  };
 }

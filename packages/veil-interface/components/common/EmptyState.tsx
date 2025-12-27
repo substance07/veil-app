@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import Link from "next/link"
+import Link from "next/link";
 
 interface EmptyStateProps {
-  icon?: React.ReactNode
-  title: string
-  description: string
-  actionLabel?: string
-  actionHref?: string
-  onAction?: () => void
+  icon?: React.ReactNode;
+  title: string;
+  description: string;
+  actionLabel?: string;
+  actionHref?: string;
+  onAction?: () => void;
 }
 
 export function EmptyState({ icon, title, description, actionLabel, actionHref, onAction }: EmptyStateProps) {
@@ -35,5 +35,5 @@ export function EmptyState({ icon, title, description, actionLabel, actionHref, 
         </>
       )}
     </div>
-  )
+  );
 }

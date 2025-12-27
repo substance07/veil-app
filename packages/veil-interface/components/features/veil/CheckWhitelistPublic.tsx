@@ -1,255 +1,252 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ethers } from "ethers"
-import { useDecrypt, useFheInstance } from "@/lib/hooks"
-import useContract from "@/lib/hooks/useContract"
-import { useEthersProvider, useEthersSigner } from "@/lib/hooks"
-import { VEIL_WHITELIST_CONTRACT_ADDRESSES } from "@/web3/core/constants/veil"
-import VeilWhitelistABI from "@/web3/abis/VeilWhitelist.json"
-import type { VeilWhitelist } from "@/web3/contracts"
-import { useAppKit } from "@reown/appkit/react"
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import { useDecrypt, useFheInstance } from "@/lib/hooks";
+import useContract from "@/lib/hooks/useContract";
+import { useEthersProvider, useEthersSigner } from "@/lib/hooks";
+import { VEIL_WHITELIST_CONTRACT_ADDRESSES } from "@/web3/core/constants/veil";
+import VeilWhitelistABI from "@/web3/abis/VeilWhitelist.json";
+import type { VeilWhitelist } from "@/web3/contracts";
+import { useAppKit } from "@reown/appkit/react";
 
 interface CheckWhitelistPublicProps {
-  campaignId: number
-  chainId: number
-  onMessage?: (message: string) => void
+  campaignId: number;
+  chainId: number;
+  onMessage?: (message: string) => void;
 }
 
 export function CheckWhitelistPublic({ campaignId, chainId, onMessage }: CheckWhitelistPublicProps) {
-  const [addressInput, setAddressInput] = useState<string>("")
-  const [isChecking, setIsChecking] = useState(false)
-  const [checkResult, setCheckResult] = useState<boolean | null>(null)
-  const [checkHandle, setCheckHandle] = useState<string>("")
-  const [isEncrypting, setIsEncrypting] = useState(false)
-  const [encryptError, setEncryptError] = useState<string>("")
+  const [addressInput, setAddressInput] = useState<string>("");
+  const [isChecking, setIsChecking] = useState(false);
+  const [checkResult, setCheckResult] = useState<boolean | null>(null);
+  const [checkHandle, setCheckHandle] = useState<string>("");
+  const [isEncrypting, setIsEncrypting] = useState(false);
+  const [encryptError, setEncryptError] = useState<string>("");
 
-  const { publicDecryptEbool, isDecrypting, error: decryptError } = useDecrypt()
-  const fheInstance = useFheInstance()
-  const provider = useEthersProvider({ chainId })
-  const signer = useEthersSigner({ chainId })
-  const appKit = useAppKit()
+  const { publicDecryptEbool, isDecrypting, error: decryptError } = useDecrypt();
+  const fheInstance = useFheInstance();
+  const provider = useEthersProvider({ chainId });
+  const signer = useEthersSigner({ chainId });
+  const appKit = useAppKit();
 
-  const contractAddress = VEIL_WHITELIST_CONTRACT_ADDRESSES[chainId as keyof typeof VEIL_WHITELIST_CONTRACT_ADDRESSES]
+  const contractAddress = VEIL_WHITELIST_CONTRACT_ADDRESSES[chainId as keyof typeof VEIL_WHITELIST_CONTRACT_ADDRESSES];
 
-  const readContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, false, chainId)
-  const writeContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, true, chainId)
+  const readContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, false, chainId);
+  const writeContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, true, chainId);
 
-  const [connectedAddress, setConnectedAddress] = useState<string>("")
-  
+  const [connectedAddress, setConnectedAddress] = useState<string>("");
+
   useEffect(() => {
     const getConnectedAddress = async () => {
       if (signer) {
         try {
-          const address = await signer.getAddress()
-          setConnectedAddress(address)
-          setAddressInput(address)
+          const address = await signer.getAddress();
+          setConnectedAddress(address);
+          setAddressInput(address);
         } catch (error) {
-          console.error("Failed to get connected address:", error)
-          setConnectedAddress("")
+          console.error("Failed to get connected address:", error);
+          setConnectedAddress("");
         }
       } else {
-        setConnectedAddress("")
-        setAddressInput("")
+        setConnectedAddress("");
+        setAddressInput("");
       }
-    }
-    getConnectedAddress()
-  }, [signer])
+    };
+    getConnectedAddress();
+  }, [signer]);
 
   const encryptAddress = async (contractAddress: string, addressToEncrypt: string, userAddress: string) => {
-    setIsEncrypting(true)
-    setEncryptError("")
+    setIsEncrypting(true);
+    setEncryptError("");
 
     try {
-      const fhe = fheInstance
-      if (!fhe) throw new Error("FHE instance not initialized")
+      const fhe = fheInstance;
+      if (!fhe) throw new Error("FHE instance not initialized");
 
       // Validate address
       if (!ethers.isAddress(addressToEncrypt)) {
-        throw new Error("Invalid address format")
+        throw new Error("Invalid address format");
       }
 
       if (!ethers.isAddress(userAddress)) {
-        throw new Error("Invalid user address format")
+        throw new Error("Invalid user address format");
       }
 
-      const inputHandle = fhe.createEncryptedInput(contractAddress, userAddress)
-      inputHandle.addAddress(addressToEncrypt)
+      const inputHandle = fhe.createEncryptedInput(contractAddress, userAddress);
+      inputHandle.addAddress(addressToEncrypt);
 
-      const result = await inputHandle.encrypt()
+      const result = await inputHandle.encrypt();
 
       if (result && typeof result === "object") {
         const toHexString = (value: any): string => {
           if (typeof value === "string") {
             if (value.startsWith("0x")) {
-              return value
+              return value;
             }
-            return ethers.hexlify(ethers.toUtf8Bytes(value))
+            return ethers.hexlify(ethers.toUtf8Bytes(value));
           }
           if (value instanceof Uint8Array) {
-            return ethers.hexlify(value)
+            return ethers.hexlify(value);
           }
           if (ArrayBuffer.isView(value)) {
-            return ethers.hexlify(new Uint8Array(value.buffer, value.byteOffset, value.byteLength))
+            return ethers.hexlify(new Uint8Array(value.buffer, value.byteOffset, value.byteLength));
           }
-          throw new Error("Unsupported data type for encryption result")
-        }
+          throw new Error("Unsupported data type for encryption result");
+        };
 
         if (result.handles && Array.isArray(result.handles) && result.handles.length > 0) {
           return {
             encryptedData: toHexString(result.handles[0]),
             proof: toHexString(result.inputProof),
-          }
+          };
         }
-        const encryptedData = (result as any).encryptedData
-        const proof = (result as any).proof
+        const encryptedData = (result as any).encryptedData;
+        const proof = (result as any).proof;
         if (encryptedData && proof) {
           return {
             encryptedData: toHexString(encryptedData),
             proof: toHexString(proof),
-          }
+          };
         }
       }
 
-      throw new Error("Invalid encryption result format")
+      throw new Error("Invalid encryption result format");
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Encryption failed"
-      setEncryptError(errorMsg)
-      throw err
+      const errorMsg = err instanceof Error ? err.message : "Encryption failed";
+      setEncryptError(errorMsg);
+      throw err;
     } finally {
-      setIsEncrypting(false)
+      setIsEncrypting(false);
     }
-  }
+  };
 
   const checkAccess = async () => {
     if (!signer) {
-      onMessage?.("Please connect your wallet to check whitelist")
+      onMessage?.("Please connect your wallet to check whitelist");
       try {
-        appKit?.open?.({ view: "Connect" })
+        appKit?.open?.({ view: "Connect" });
       } catch (error) {
-        console.error("Failed to open wallet connect:", error)
+        console.error("Failed to open wallet connect:", error);
       }
-      return
+      return;
     }
 
     if (!connectedAddress) {
-      onMessage?.("Unable to get wallet address. Please try again.")
-      return
+      onMessage?.("Unable to get wallet address. Please try again.");
+      return;
     }
 
-    const addressToCheck = connectedAddress
+    const addressToCheck = connectedAddress;
 
     if (!readContract || !writeContract || !contractAddress || !provider) {
-      onMessage?.("Contract not available on this chain")
-      return
+      onMessage?.("Contract not available on this chain");
+      return;
     }
 
     if (!signer) {
-      onMessage?.("Please connect your wallet to check whitelist")
+      onMessage?.("Please connect your wallet to check whitelist");
       try {
-        appKit?.open?.({ view: "Connect" })
+        appKit?.open?.({ view: "Connect" });
       } catch (error) {
-        console.error("Failed to open wallet connect:", error)
+        console.error("Failed to open wallet connect:", error);
       }
-      return
+      return;
     }
 
     try {
-      setIsChecking(true)
-      setCheckResult(null)
-      setCheckHandle("")
-      onMessage?.("Encrypting address...")
+      setIsChecking(true);
+      setCheckResult(null);
+      setCheckHandle("");
+      onMessage?.("Encrypting address...");
 
-      const userAddress = await signer.getAddress()
+      const userAddress = await signer.getAddress();
 
       if (addressToCheck.toLowerCase() !== userAddress.toLowerCase()) {
         throw new Error(
           `Address to check must match connected wallet. Your wallet: ${userAddress.substring(0, 6)}...${userAddress.substring(38)}`
-        )
+        );
       }
 
-      const encryptedInput = await encryptAddress(contractAddress, addressToCheck, userAddress)
+      const encryptedInput = await encryptAddress(contractAddress, addressToCheck, userAddress);
 
       if (!encryptedInput || !encryptedInput.encryptedData || !encryptedInput.proof) {
-        throw new Error("Failed to encrypt address")
+        throw new Error("Failed to encrypt address");
       }
 
-      onMessage?.("Sending transaction to check whitelist...")
-      
-      const tx = await writeContract.checkAccessAll(
-        campaignId,
-        encryptedInput.encryptedData,
-        encryptedInput.proof,
-      )
+      onMessage?.("Sending transaction to check whitelist...");
 
-      onMessage?.("Waiting for transaction confirmation...")
-      const receipt = await tx.wait()
+      const tx = await writeContract.checkAccessAll(campaignId, encryptedInput.encryptedData, encryptedInput.proof);
+
+      onMessage?.("Waiting for transaction confirmation...");
+      const receipt = await tx.wait();
 
       if (!receipt) {
-        throw new Error("Transaction not confirmed")
+        throw new Error("Transaction not confirmed");
       }
 
-      onMessage?.("Reading result from contract...")
+      onMessage?.("Reading result from contract...");
 
-      const encryptedResult = await writeContract.getMyLastCheck(campaignId)
-      
-      console.log("encryptedResult from contract:", encryptedResult)
+      const encryptedResult = await writeContract.getMyLastCheck(campaignId);
+
+      console.log("encryptedResult from contract:", encryptedResult);
 
       if (!encryptedResult) {
-        throw new Error("No result received from contract")
+        throw new Error("No result received from contract");
       }
 
-      const handleString = typeof encryptedResult === "string" 
-        ? (encryptedResult.startsWith("0x") ? encryptedResult : `0x${encryptedResult}`)
-        : String(encryptedResult)
-      
+      const handleString =
+        typeof encryptedResult === "string"
+          ? encryptedResult.startsWith("0x")
+            ? encryptedResult
+            : `0x${encryptedResult}`
+          : String(encryptedResult);
+
       if (handleString.length !== 66 || !handleString.startsWith("0x")) {
-        console.error("Invalid handle format:", handleString)
-        throw new Error(`Invalid handle: ${handleString.substring(0, 20)}...`)
+        console.error("Invalid handle format:", handleString);
+        throw new Error(`Invalid handle: ${handleString.substring(0, 20)}...`);
       }
 
-      setCheckHandle(handleString)
-      onMessage?.("Decrypting result...")
+      setCheckHandle(handleString);
+      onMessage?.("Decrypting result...");
 
-      const isWhitelisted = await publicDecryptEbool(handleString)
-      setCheckResult(isWhitelisted)
+      const isWhitelisted = await publicDecryptEbool(handleString);
+      setCheckResult(isWhitelisted);
 
-      onMessage?.(
-        `Result: ${isWhitelisted ? "This address is whitelisted" : "This address is not whitelisted"}`,
-      )
-      setTimeout(() => onMessage?.(""), 3000)
+      onMessage?.(`Result: ${isWhitelisted ? "This address is whitelisted" : "This address is not whitelisted"}`);
+      setTimeout(() => onMessage?.(""), 3000);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      const errorString = errorMessage.toLowerCase()
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorString = errorMessage.toLowerCase();
 
-      console.error("Check access failed:", error)
+      console.error("Check access failed:", error);
 
       if (errorString.includes("campaignnotfound")) {
-        onMessage?.("Campaign not found")
+        onMessage?.("Campaign not found");
       } else if (errorString.includes("fhe instance not initialized") || errorString.includes("fhe")) {
-        onMessage?.("FHE instance not initialized. Please wait...")
+        onMessage?.("FHE instance not initialized. Please wait...");
       } else if (errorString.includes("encrypt") || errorString.includes("encryption")) {
-        onMessage?.(`Encryption failed: ${errorMessage}`)
+        onMessage?.(`Encryption failed: ${errorMessage}`);
       } else if (errorString.includes("decrypt") || errorString.includes("decryption")) {
-        onMessage?.(`Decryption failed: ${errorMessage}`)
+        onMessage?.(`Decryption failed: ${errorMessage}`);
       } else if (errorString.includes("user rejected") || errorString.includes("denied")) {
-        onMessage?.("Transaction rejected")
+        onMessage?.("Transaction rejected");
       } else if (errorString.includes("sendernotallowed")) {
-        onMessage?.("ACL Error: Encrypted address does not match transaction sender address")
+        onMessage?.("ACL Error: Encrypted address does not match transaction sender address");
       } else {
-        onMessage?.(`Check failed: ${errorMessage}`)
+        onMessage?.(`Check failed: ${errorMessage}`);
       }
     } finally {
-      setIsChecking(false)
+      setIsChecking(false);
     }
-  }
+  };
 
   if (!contractAddress) {
     return (
       <div className="info-card border-destructive/30">
         <p className="text-destructive text-sm text-center">Contract not deployed on this chain</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -270,7 +267,8 @@ export function CheckWhitelistPublic({ campaignId, chainId, onMessage }: CheckWh
         {!signer && (
           <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
             <p className="text-yellow-200 text-xs">
-              ⚠️ You need to connect your wallet to check whitelist. The wallet will be required to sign a transaction to perform the check.
+              ⚠️ You need to connect your wallet to check whitelist. The wallet will be required to sign a transaction
+              to perform the check.
             </p>
           </div>
         )}
@@ -353,6 +351,5 @@ export function CheckWhitelistPublic({ campaignId, chainId, onMessage }: CheckWh
         )}
       </div>
     </div>
-  )
+  );
 }
-

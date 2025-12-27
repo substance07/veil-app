@@ -6,10 +6,10 @@
  * @returns The truncated string
  */
 export function truncateString(s: string | null | undefined, start = 6, end = 4) {
-  if (start < 0 || end < 0) throw new Error("Invalid position")
-  if (!s) return ""
-  if (s.length <= start + end) return s
-  return s.slice(0, start) + "..." + s.slice(s.length - end)
+  if (start < 0 || end < 0) throw new Error("Invalid position");
+  if (!s) return "";
+  if (s.length <= start + end) return s;
+  return s.slice(0, start) + "..." + s.slice(s.length - end);
 }
 
 /**
@@ -18,5 +18,5 @@ export function truncateString(s: string | null | undefined, start = 6, end = 4)
  * @returns The escaped string
  */
 export function escapeRegExp(string: string): string {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // $& means the whole matched string
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }

@@ -1,34 +1,34 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ethers } from "ethers"
-import { useDecrypt, useFheInstance } from "@/lib/hooks"
-import useContract from "@/lib/hooks/useContract"
-import { useEthersSigner } from "@/lib/hooks"
-import { VEIL_WHITELIST_CONTRACT_ADDRESSES } from "@/web3/core/constants/veil"
-import VeilWhitelistABI from "@/web3/abis/VeilWhitelist.json"
-import type { VeilWhitelist } from "@/web3/contracts"
-import { CreateCampaign } from "./CreateCampaign"
-import { CampaignsList } from "./CampaignsList"
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import { useDecrypt, useFheInstance } from "@/lib/hooks";
+import useContract from "@/lib/hooks/useContract";
+import { useEthersSigner } from "@/lib/hooks";
+import { VEIL_WHITELIST_CONTRACT_ADDRESSES } from "@/web3/core/constants/veil";
+import VeilWhitelistABI from "@/web3/abis/VeilWhitelist.json";
+import type { VeilWhitelist } from "@/web3/contracts";
+import { CreateCampaign } from "./CreateCampaign";
+import { CampaignsList } from "./CampaignsList";
 
-type WhitelistMode = "manage" | "check" | "all"
+type WhitelistMode = "manage" | "check" | "all";
 
 interface FheWhitelistProps {
-  account: string
-  chainId: number
-  isConnected: boolean
-  isInitialized: boolean
-  onMessage: (message: string) => void
-  mode?: WhitelistMode
-  initialCampaignId?: number
+  account: string;
+  chainId: number;
+  isConnected: boolean;
+  isInitialized: boolean;
+  onMessage: (message: string) => void;
+  mode?: WhitelistMode;
+  initialCampaignId?: number;
 }
 
 interface Campaign {
-  id: number
-  name: string
-  owner: string
-  exists: boolean
-  whitelistSize: number
+  id: number;
+  name: string;
+  owner: string;
+  exists: boolean;
+  whitelistSize: number;
 }
 
 export function FheWhitelist({
@@ -40,124 +40,124 @@ export function FheWhitelist({
   mode = "all",
   initialCampaignId,
 }: FheWhitelistProps) {
-  const [campaignCount, setCampaignCount] = useState<number>(0)
-  const [campaigns, setCampaigns] = useState<Campaign[]>([])
-  const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(initialCampaignId ?? null)
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null)
-  const [isOwner, setIsOwner] = useState<boolean>(false)
-  const [isChecking, setIsChecking] = useState(false)
-  const [isAdding, setIsAdding] = useState(false)
-  const [checkResult, setCheckResult] = useState<boolean | null>(null)
-  const [checkHandle, setCheckHandle] = useState<string>("")
-  const [addressesInput, setAddressesInput] = useState<string>("")
-  const [linkCopied, setLinkCopied] = useState(false)
+  const [campaignCount, setCampaignCount] = useState<number>(0);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(initialCampaignId ?? null);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [checkResult, setCheckResult] = useState<boolean | null>(null);
+  const [checkHandle, setCheckHandle] = useState<string>("");
+  const [addressesInput, setAddressesInput] = useState<string>("");
+  const [linkCopied, setLinkCopied] = useState(false);
 
-  const [isEncrypting, setIsEncrypting] = useState(false)
-  const [encryptError, setEncryptError] = useState<string>("")
-  const { userDecryptEbool, isDecrypting, error: decryptError } = useDecrypt()
-  const fheInstance = useFheInstance()
+  const [isEncrypting, setIsEncrypting] = useState(false);
+  const [encryptError, setEncryptError] = useState<string>("");
+  const { userDecryptEbool, isDecrypting, error: decryptError } = useDecrypt();
+  const fheInstance = useFheInstance();
 
-  const contractAddress = VEIL_WHITELIST_CONTRACT_ADDRESSES[chainId as keyof typeof VEIL_WHITELIST_CONTRACT_ADDRESSES]
+  const contractAddress = VEIL_WHITELIST_CONTRACT_ADDRESSES[chainId as keyof typeof VEIL_WHITELIST_CONTRACT_ADDRESSES];
 
-  const readContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, false, chainId)
-  const writeContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, true, chainId)
-  const signer = useEthersSigner({ chainId })
+  const readContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, false, chainId);
+  const writeContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, true, chainId);
+  const signer = useEthersSigner({ chainId });
 
   const encryptAddress = async (contractAddress: string, userAddress: string, addressToEncrypt: string) => {
-    setIsEncrypting(true)
-    setEncryptError("")
+    setIsEncrypting(true);
+    setEncryptError("");
 
     try {
-      const fhe = fheInstance
-      if (!fhe) throw new Error("FHE instance not initialized")
+      const fhe = fheInstance;
+      if (!fhe) throw new Error("FHE instance not initialized");
 
       if (!ethers.isAddress(addressToEncrypt)) {
-        throw new Error("Invalid address format")
+        throw new Error("Invalid address format");
       }
 
-      const inputHandle = fhe.createEncryptedInput(contractAddress, userAddress)
-      inputHandle.addAddress(addressToEncrypt)
+      const inputHandle = fhe.createEncryptedInput(contractAddress, userAddress);
+      inputHandle.addAddress(addressToEncrypt);
 
-      const result = await inputHandle.encrypt()
+      const result = await inputHandle.encrypt();
 
       if (result && typeof result === "object") {
         const toHexString = (value: any): string => {
           if (typeof value === "string") {
             if (value.startsWith("0x")) {
-              return value
+              return value;
             }
-            return ethers.hexlify(ethers.toUtf8Bytes(value))
+            return ethers.hexlify(ethers.toUtf8Bytes(value));
           }
           if (value instanceof Uint8Array) {
-            return ethers.hexlify(value)
+            return ethers.hexlify(value);
           }
           if (ArrayBuffer.isView(value)) {
-            return ethers.hexlify(new Uint8Array(value.buffer, value.byteOffset, value.byteLength))
+            return ethers.hexlify(new Uint8Array(value.buffer, value.byteOffset, value.byteLength));
           }
-          throw new Error("Unsupported data type for encryption result")
-        }
+          throw new Error("Unsupported data type for encryption result");
+        };
 
         if (result.handles && Array.isArray(result.handles) && result.handles.length > 0) {
           return {
             encryptedData: toHexString(result.handles[0]),
             proof: toHexString(result.inputProof),
-          }
+          };
         }
-        const encryptedData = (result as any).encryptedData
-        const proof = (result as any).proof
+        const encryptedData = (result as any).encryptedData;
+        const proof = (result as any).proof;
         if (encryptedData && proof) {
           return {
             encryptedData: toHexString(encryptedData),
             proof: toHexString(proof),
-          }
+          };
         }
       }
 
-      throw new Error("Invalid encryption result format")
+      throw new Error("Invalid encryption result format");
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Encryption failed"
-      setEncryptError(errorMsg)
-      throw err
+      const errorMsg = err instanceof Error ? err.message : "Encryption failed";
+      setEncryptError(errorMsg);
+      throw err;
     } finally {
-      setIsEncrypting(false)
+      setIsEncrypting(false);
     }
-  }
+  };
 
-  const showManagement = mode !== "check"
-  const showCheck = mode !== "manage"
+  const showManagement = mode !== "check";
+  const showCheck = mode !== "manage";
 
   const handleCopyLink = async (link: string) => {
-    if (!link || typeof navigator === "undefined" || !navigator.clipboard) return
+    if (!link || typeof navigator === "undefined" || !navigator.clipboard) return;
     try {
-      await navigator.clipboard.writeText(link)
-      setLinkCopied(true)
-      setTimeout(() => setLinkCopied(false), 2000)
+      await navigator.clipboard.writeText(link);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
     } catch (error) {
-      console.error("Failed to copy link:", error)
+      console.error("Failed to copy link:", error);
     }
-  }
+  };
 
   const loadCampaigns = async () => {
     if (!isConnected || !readContract) {
-      return
+      return;
     }
 
     try {
-      const count = await readContract.campaignCount()
-      const campaignCountNum = Number(count)
-      setCampaignCount(campaignCountNum)
+      const count = await readContract.campaignCount();
+      const campaignCountNum = Number(count);
+      setCampaignCount(campaignCountNum);
 
       if (campaignCountNum === 0) {
-        setCampaigns([])
-        setSelectedCampaignId(null)
-        setSelectedCampaign(null)
-        return
+        setCampaigns([]);
+        setSelectedCampaignId(null);
+        setSelectedCampaign(null);
+        return;
       }
 
-      const campaignsList: Campaign[] = []
+      const campaignsList: Campaign[] = [];
       for (let i = 1; i <= campaignCountNum; i++) {
         try {
-          const campaignInfo = await readContract.getCampaignInfo(i)
+          const campaignInfo = await readContract.getCampaignInfo(i);
           if (campaignInfo.exists) {
             campaignsList.push({
               id: i,
@@ -165,43 +165,43 @@ export function FheWhitelist({
               owner: campaignInfo.owner,
               exists: campaignInfo.exists,
               whitelistSize: Number(campaignInfo.whitelistSize),
-            })
+            });
           }
         } catch (error) {
-          console.error(`Failed to load campaign ${i}:`, error)
+          console.error(`Failed to load campaign ${i}:`, error);
         }
       }
 
-      setCampaigns(campaignsList)
+      setCampaigns(campaignsList);
 
       if (!selectedCampaignId && campaignsList.length > 0) {
-        const initialMatch = initialCampaignId ? campaignsList.find((c) => c.id === initialCampaignId) : null
+        const initialMatch = initialCampaignId ? campaignsList.find((c) => c.id === initialCampaignId) : null;
         if (initialMatch) {
-          setSelectedCampaignId(initialMatch.id)
-          setSelectedCampaign(initialMatch)
+          setSelectedCampaignId(initialMatch.id);
+          setSelectedCampaign(initialMatch);
         } else {
-          setSelectedCampaignId(campaignsList[0].id)
-          setSelectedCampaign(campaignsList[0])
+          setSelectedCampaignId(campaignsList[0].id);
+          setSelectedCampaign(campaignsList[0]);
         }
       } else if (selectedCampaignId) {
-        const updated = campaignsList.find((c) => c.id === selectedCampaignId)
+        const updated = campaignsList.find((c) => c.id === selectedCampaignId);
         if (updated) {
-          setSelectedCampaign(updated)
+          setSelectedCampaign(updated);
         }
       }
     } catch (error) {
-      console.error("Failed to load campaigns:", error)
+      console.error("Failed to load campaigns:", error);
     }
-  }
+  };
 
   const loadCampaignData = async (campaignId: number) => {
     if (!isConnected || !readContract || !campaignId) {
-      return
+      return;
     }
 
     try {
-      const campaignInfo = await readContract.getCampaignInfo(campaignId)
-      const isOwnerResult = await readContract.isCampaignOwner(campaignId, account)
+      const campaignInfo = await readContract.getCampaignInfo(campaignId);
+      const isOwnerResult = await readContract.isCampaignOwner(campaignId, account);
 
       const campaign: Campaign = {
         id: campaignId,
@@ -209,10 +209,10 @@ export function FheWhitelist({
         owner: campaignInfo.owner,
         exists: campaignInfo.exists,
         whitelistSize: Number(campaignInfo.whitelistSize),
-      }
+      };
 
-      setSelectedCampaign(campaign)
-      setIsOwner(isOwnerResult)
+      setSelectedCampaign(campaign);
+      setIsOwner(isOwnerResult);
 
       console.log("Campaign data loaded:", {
         campaignId,
@@ -220,234 +220,230 @@ export function FheWhitelist({
         owner: campaign.owner,
         whitelistSize: campaign.whitelistSize,
         isOwner: isOwnerResult,
-      })
+      });
     } catch (error) {
-      console.error("Failed to load campaign data:", error)
+      console.error("Failed to load campaign data:", error);
       if (error instanceof Error && error.message.includes("CampaignNotFound")) {
-        onMessage("Campaign not found")
+        onMessage("Campaign not found");
       }
     }
-  }
+  };
 
   const handleCampaignCreated = async (campaignId: number) => {
-    await loadCampaigns()
+    await loadCampaigns();
     if (campaignId > 0) {
-      setSelectedCampaignId(campaignId)
-      await loadCampaignData(campaignId)
+      setSelectedCampaignId(campaignId);
+      await loadCampaignData(campaignId);
     }
-  }
+  };
 
   useEffect(() => {
     if (isConnected && isInitialized && readContract && account) {
-      loadCampaigns()
+      loadCampaigns();
     }
-  }, [isConnected, isInitialized, account, readContract])
+  }, [isConnected, isInitialized, account, readContract]);
 
   useEffect(() => {
     if (isConnected && isInitialized && readContract && account && selectedCampaignId) {
-      loadCampaignData(selectedCampaignId)
+      loadCampaignData(selectedCampaignId);
     }
-  }, [selectedCampaignId, isConnected, isInitialized, account, readContract])
+  }, [selectedCampaignId, isConnected, isInitialized, account, readContract]);
 
   const checkAccess = async () => {
     if (!isConnected || !readContract || !writeContract || !selectedCampaignId || !contractAddress) {
-      onMessage("Please select a campaign first")
-      return
+      onMessage("Please select a campaign first");
+      return;
     }
 
     if (!account) {
-      onMessage("Please connect your wallet")
-      return
+      onMessage("Please connect your wallet");
+      return;
     }
 
     try {
-      setIsChecking(true)
-      setCheckResult(null)
-      setCheckHandle("")
-      onMessage("Encrypting address...")
+      setIsChecking(true);
+      setCheckResult(null);
+      setCheckHandle("");
+      onMessage("Encrypting address...");
 
-      onMessage("Encrypting address for whitelist check...")
-      const encryptedInput = await encryptAddress(contractAddress, account, account)
+      onMessage("Encrypting address for whitelist check...");
+      const encryptedInput = await encryptAddress(contractAddress, account, account);
 
       if (!encryptedInput || !encryptedInput.encryptedData || !encryptedInput.proof) {
-        throw new Error("Failed to encrypt address")
+        throw new Error("Failed to encrypt address");
       }
 
-      onMessage("Checking whitelist...")
+      onMessage("Checking whitelist...");
       const result = await writeContract.checkAccessAll(
         selectedCampaignId,
         encryptedInput.encryptedData,
-        encryptedInput.proof,
-      )
+        encryptedInput.proof
+      );
 
       if (!result) {
-        throw new Error("No result returned from contract")
+        throw new Error("No result returned from contract");
       }
 
-      setCheckHandle(result)
-      onMessage("Decrypting result...")
+      setCheckHandle(result);
+      onMessage("Decrypting result...");
 
       if (!signer) {
-        throw new Error("Signer is required for decryption")
+        throw new Error("Signer is required for decryption");
       }
 
-      const isWhitelisted = await userDecryptEbool(result, contractAddress, signer)
-      setCheckResult(isWhitelisted)
+      const isWhitelisted = await userDecryptEbool(result, contractAddress, signer);
+      setCheckResult(isWhitelisted);
 
-      onMessage(`Whitelist check completed: ${isWhitelisted ? "Whitelisted" : "Not whitelisted"}`)
-      setTimeout(() => onMessage(""), 3000)
+      onMessage(`Whitelist check completed: ${isWhitelisted ? "Whitelisted" : "Not whitelisted"}`);
+      setTimeout(() => onMessage(""), 3000);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      const errorString = errorMessage.toLowerCase()
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorString = errorMessage.toLowerCase();
 
-      console.error("Check access failed:", error)
+      console.error("Check access failed:", error);
 
       if (errorString.includes("campaignnotfound")) {
-        onMessage("Campaign not found")
+        onMessage("Campaign not found");
       } else if (errorString.includes("fhe instance not initialized") || errorString.includes("fhe")) {
-        onMessage("FHE instance not initialized. Please wait for initialization.")
+        onMessage("FHE instance not initialized. Please wait for initialization.");
       } else if (errorString.includes("encrypt") || errorString.includes("encryption")) {
-        onMessage(`Encryption failed: ${errorMessage}`)
+        onMessage(`Encryption failed: ${errorMessage}`);
       } else if (errorString.includes("decrypt") || errorString.includes("decryption")) {
-        onMessage(`Decryption failed: ${errorMessage}`)
+        onMessage(`Decryption failed: ${errorMessage}`);
       } else if (errorString.includes("user rejected") || errorString.includes("denied")) {
-        onMessage("Transaction was rejected")
+        onMessage("Transaction was rejected");
       } else {
-        onMessage(`Check access failed: ${errorMessage}`)
+        onMessage(`Check access failed: ${errorMessage}`);
       }
     } finally {
-      setIsChecking(false)
+      setIsChecking(false);
     }
-  }
+  };
 
   const addToWhitelist = async () => {
     if (!isConnected || !isOwner || !selectedCampaignId || !writeContract || !contractAddress) {
-      onMessage("Missing requirements")
-      return
+      onMessage("Missing requirements");
+      return;
     }
-  
+
     try {
-      setIsAdding(true)
-      onMessage("Processing addresses...")
-  
+      setIsAdding(true);
+      onMessage("Processing addresses...");
+
       const addresses = addressesInput
         .split(/[,\n]/)
         .map((a) => a.trim())
-        .filter((a) => ethers.isAddress(a))
-  
-      if (addresses.length === 0) {
-        onMessage("No valid addresses found")
-        return
-      }
-  
-      const fhe = fheInstance
-      if (!fhe) throw new Error("FHE instance not initialized")
-  
-      onMessage(`Encrypting ${addresses.length} address(es)...`)
-  
-      const input = fhe.createEncryptedInput(contractAddress, account)
-  
-      for (const addr of addresses) {
-        input.addAddress(addr)
-      }
-  
-      const encrypted = await input.encrypt()
-  
-      const encryptedAddresses = encrypted.handles
-      const attestation = encrypted.inputProof
+        .filter((a) => ethers.isAddress(a));
 
-      console.log("handles count:", encryptedAddresses.length)
-      console.log("proof length:", attestation.length)
+      if (addresses.length === 0) {
+        onMessage("No valid addresses found");
+        return;
+      }
+
+      const fhe = fheInstance;
+      if (!fhe) throw new Error("FHE instance not initialized");
+
+      onMessage(`Encrypting ${addresses.length} address(es)...`);
+
+      const input = fhe.createEncryptedInput(contractAddress, account);
+
+      for (const addr of addresses) {
+        input.addAddress(addr);
+      }
+
+      const encrypted = await input.encrypt();
+
+      const encryptedAddresses = encrypted.handles;
+      const attestation = encrypted.inputProof;
+
+      console.log("handles count:", encryptedAddresses.length);
+      console.log("proof length:", attestation.length);
 
       if (!readContract) {
-        throw new Error("readContract is not available")
+        throw new Error("readContract is not available");
       }
 
-      const campaignInfo = await readContract.getCampaignInfo(selectedCampaignId)
+      const campaignInfo = await readContract.getCampaignInfo(selectedCampaignId);
       console.log("🔍 Campaign info:", {
         campaignId: selectedCampaignId,
         exists: campaignInfo.exists,
         owner: campaignInfo.owner,
         name: campaignInfo.name,
-      })
+      });
 
       if (!campaignInfo.exists) {
-        throw new Error(`Campaign ${selectedCampaignId} does not exist on this contract`)
+        throw new Error(`Campaign ${selectedCampaignId} does not exist on this contract`);
       }
 
-      const accountLower = account.toLowerCase()
-      const ownerLower = campaignInfo.owner.toLowerCase()
+      const accountLower = account.toLowerCase();
+      const ownerLower = campaignInfo.owner.toLowerCase();
       console.log("🔍 Owner check:", {
         account: account,
         accountLower: accountLower,
         owner: campaignInfo.owner,
         ownerLower: ownerLower,
         match: accountLower === ownerLower,
-      })
+      });
 
       if (accountLower !== ownerLower) {
         throw new Error(
           `You are not the campaign owner. Campaign owner: ${campaignInfo.owner}, Your account: ${account}`
-        )
+        );
       }
 
       if (!signer) {
-        throw new Error("Signer is not available")
+        throw new Error("Signer is not available");
       }
-      const signerAddress = await signer.getAddress()
+      const signerAddress = await signer.getAddress();
       console.log("🔍 Signer check:", {
         signerAddress: signerAddress,
         account: account,
         match: signerAddress.toLowerCase() === accountLower,
-      })
+      });
 
       if (signerAddress.toLowerCase() !== accountLower) {
-        throw new Error("Signer address does not match connected account")
+        throw new Error("Signer address does not match connected account");
       }
 
       try {
-        const encodedData = writeContract.interface.encodeFunctionData(
-          "addWhitelist",
-          [selectedCampaignId, encryptedAddresses, attestation]
-        )
-        console.log("✅ Encoded calldata length:", encodedData.length)
+        const encodedData = writeContract.interface.encodeFunctionData("addWhitelist", [
+          selectedCampaignId,
+          encryptedAddresses,
+          attestation,
+        ]);
+        console.log("✅ Encoded calldata length:", encodedData.length);
         if (encodedData === "0x" || encodedData.length < 10) {
-          throw new Error("Encoded calldata is empty or invalid")
+          throw new Error("Encoded calldata is empty or invalid");
         }
       } catch (encodeError) {
-        console.error("❌ Encode failed:", encodeError)
-        throw new Error(`Failed to encode function data: ${encodeError instanceof Error ? encodeError.message : String(encodeError)}`)
+        console.error("❌ Encode failed:", encodeError);
+        throw new Error(
+          `Failed to encode function data: ${encodeError instanceof Error ? encodeError.message : String(encodeError)}`
+        );
       }
 
-      onMessage("Sending transaction...")
+      onMessage("Sending transaction...");
 
-      const tx = await writeContract.addWhitelist(
-        selectedCampaignId,
-        encryptedAddresses,
-        attestation,
-        {
-          gasLimit: 3_000_000,
-        }
-      )
-  
-      await tx.wait()
-  
-      onMessage(`✅ Added ${addresses.length} address(es)`)
-      setAddressesInput("")
-      await loadCampaignData(selectedCampaignId)
-      await loadCampaigns()
-  
+      const tx = await writeContract.addWhitelist(selectedCampaignId, encryptedAddresses, attestation, {
+        gasLimit: 3_000_000,
+      });
+
+      await tx.wait();
+
+      onMessage(`✅ Added ${addresses.length} address(es)`);
+      setAddressesInput("");
+      await loadCampaignData(selectedCampaignId);
+      await loadCampaigns();
     } catch (err: any) {
-      console.error("Add whitelist failed:", err)
-      onMessage(err?.message || "Add whitelist failed")
+      console.error("Add whitelist failed:", err);
+      onMessage(err?.message || "Add whitelist failed");
     } finally {
-      setIsAdding(false)
+      setIsAdding(false);
     }
-  }
-  
+  };
 
   if (!isConnected || !isInitialized) {
-    return null
+    return null;
   }
 
   if (!contractAddress) {
@@ -455,7 +451,7 @@ export function FheWhitelist({
       <div className="info-card border-destructive/30">
         <p className="text-destructive text-sm text-center">Contract not deployed on this chain</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -518,7 +514,7 @@ export function FheWhitelist({
                 <button
                   onClick={() =>
                     handleCopyLink(
-                      `${typeof window !== "undefined" ? window.location.origin : ""}/veil/campaigns/${selectedCampaign.id}`,
+                      `${typeof window !== "undefined" ? window.location.origin : ""}/veil/campaigns/${selectedCampaign.id}`
                     )
                   }
                   className="btn-secondary text-xs px-3 py-2"
@@ -745,5 +741,5 @@ export function FheWhitelist({
         )}
       </div>
     </div>
-  )
+  );
 }

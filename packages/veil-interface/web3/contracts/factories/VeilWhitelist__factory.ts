@@ -506,10 +506,7 @@ export class VeilWhitelist__factory {
   static createInterface(): VeilWhitelistInterface {
     return new Interface(_abi) as VeilWhitelistInterface;
   }
-  static connect(
-    address: string,
-    runner?: ContractRunner | null
-  ): VeilWhitelist {
+  static connect(address: string, runner?: ContractRunner | null): VeilWhitelist {
     return new Contract(address, _abi, runner) as unknown as VeilWhitelist;
   }
 }

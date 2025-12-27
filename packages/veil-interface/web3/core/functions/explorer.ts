@@ -1,21 +1,21 @@
-import { ChainId } from "../constants"
+import { ChainId } from "../constants";
 
 const explorers = {
   etherscan: (link: string, data: string, type: "transaction" | "token" | "address" | "block") => {
     switch (type) {
       case "transaction":
-        return `${link}/tx/${data}`
+        return `${link}/tx/${data}`;
       default:
-        return `${link}/${type}/${data}`
+        return `${link}/${type}/${data}`;
     }
   },
-}
+};
 
 interface ChainObject {
   [chainId: number]: {
-    link: string
-    builder: (chainName: string, data: string, type: "transaction" | "token" | "address" | "block") => string
-  }
+    link: string;
+    builder: (chainName: string, data: string, type: "transaction" | "token" | "address" | "block") => string;
+  };
 }
 
 const chains: ChainObject = {
@@ -23,19 +23,19 @@ const chains: ChainObject = {
     link: "https://sepolia.etherscan.io",
     builder: explorers.etherscan,
   },
-}
+};
 
 export function getExplorerLink(
   chainId: ChainId | undefined,
   data: string,
-  type: "transaction" | "token" | "address" | "block",
+  type: "transaction" | "token" | "address" | "block"
 ): string {
-  if (!chainId) return ""
+  if (!chainId) return "";
 
-  const chain = chains[chainId]
+  const chain = chains[chainId];
   if (!chain) {
-    console.debug("could not found chain builder correspond with chain", chainId)
-    return ""
+    console.debug("could not found chain builder correspond with chain", chainId);
+    return "";
   }
-  return chain.builder(chain.link, data, type)
+  return chain.builder(chain.link, data, type);
 }

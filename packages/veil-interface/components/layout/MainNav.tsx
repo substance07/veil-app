@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import WalletButton from "@/components/common/WalletButton/index"
-import { useFhevm } from "@/lib/hooks"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import WalletButton from "@/components/common/WalletButton/index";
+import { useFhevm } from "@/lib/hooks";
 
 export function MainNav() {
-  const pathname = usePathname()
-  const { status: fhevmStatus } = useFhevm()
+  const pathname = usePathname();
+  const { status: fhevmStatus } = useFhevm();
 
   const isActive = (path: string) => {
-    if (path === "/") return pathname === "/"
-    return pathname.startsWith(path)
-  }
+    if (path === "/") return pathname === "/";
+    return pathname.startsWith(path);
+  };
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
@@ -59,5 +59,5 @@ export function MainNav() {
         </div>
       </div>
     </header>
-  )
+  );
 }

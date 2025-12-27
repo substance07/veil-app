@@ -1,69 +1,69 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useRef, useState } from "react"
-import { EmptyState } from "@/components/common/EmptyState"
+import { useEffect, useRef, useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 
 interface Campaign {
-  id: number
-  name: string
-  owner: string
-  exists: boolean
-  whitelistSize: number
+  id: number;
+  name: string;
+  owner: string;
+  exists: boolean;
+  whitelistSize: number;
 }
 
 interface CampaignsListProps {
-  campaigns: Campaign[]
-  selectedCampaignId: number | null
-  onSelectCampaign: (id: number) => void
-  account: string
+  campaigns: Campaign[];
+  selectedCampaignId: number | null;
+  onSelectCampaign: (id: number) => void;
+  account: string;
 }
 
 export function CampaignsList({ campaigns, selectedCampaignId, onSelectCampaign, account }: CampaignsListProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isOpen, setIsOpen] = useState(false)
-  const [displayCount, setDisplayCount] = useState(20)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const listRef = useRef<HTMLDivElement>(null)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [displayCount, setDisplayCount] = useState(20);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const filteredCampaigns = campaigns.filter(
     (c) =>
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.id.toString().includes(searchQuery) ||
-      c.owner.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      c.owner.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const visibleCampaigns = filteredCampaigns.slice(0, displayCount)
-  const selectedCampaign = campaigns.find((c) => c.id === selectedCampaignId)
+  const visibleCampaigns = filteredCampaigns.slice(0, displayCount);
+  const selectedCampaign = campaigns.find((c) => c.id === selectedCampaignId);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget
-    const bottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50
+    const target = e.currentTarget;
+    const bottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
     if (bottom && visibleCampaigns.length < filteredCampaigns.length) {
-      setDisplayCount((prev) => prev + 20)
+      setDisplayCount((prev) => prev + 20);
     }
-  }
+  };
 
   useEffect(() => {
-    setDisplayCount(20)
-  }, [searchQuery])
+    setDisplayCount(20);
+  }, [searchQuery]);
 
   const handleSelect = (id: number) => {
-    onSelectCampaign(id)
-    setIsOpen(false)
-    setSearchQuery("")
-  }
+    onSelectCampaign(id);
+    setIsOpen(false);
+    setSearchQuery("");
+  };
 
   if (campaigns.length === 0) {
     return (
@@ -85,7 +85,7 @@ export function CampaignsList({ campaigns, selectedCampaignId, onSelectCampaign,
           description="Create your first encrypted whitelist campaign above to get started."
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -199,8 +199,8 @@ export function CampaignsList({ campaigns, selectedCampaignId, onSelectCampaign,
             ) : (
               <div className="divide-y divide-border">
                 {visibleCampaigns.map((campaign) => {
-                  const isSelected = selectedCampaignId === campaign.id
-                  const isOwner = campaign.owner.toLowerCase() === account.toLowerCase()
+                  const isSelected = selectedCampaignId === campaign.id;
+                  const isOwner = campaign.owner.toLowerCase() === account.toLowerCase();
 
                   return (
                     <button
@@ -258,7 +258,7 @@ export function CampaignsList({ campaigns, selectedCampaignId, onSelectCampaign,
                         )}
                       </div>
                     </button>
-                  )
+                  );
                 })}
                 {/* Loading indicator for infinite scroll */}
                 {visibleCampaigns.length < filteredCampaigns.length && (
@@ -274,5 +274,5 @@ export function CampaignsList({ campaigns, selectedCampaignId, onSelectCampaign,
         </div>
       )}
     </div>
-  )
+  );
 }

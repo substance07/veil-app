@@ -1,56 +1,56 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import useWeb3 from "@/lib/hooks/useWeb3"
-import { useFhevm } from "@/lib/hooks"
-import { MainNav } from "@/components/layout/MainNav"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import useWeb3 from "@/lib/hooks/useWeb3";
+import { useFhevm } from "@/lib/hooks";
+import { MainNav } from "@/components/layout/MainNav";
 
 export default function HomePage() {
-  const router = useRouter()
-  const [campaignIdInput, setCampaignIdInput] = useState("")
-  const [inputError, setInputError] = useState("")
+  const router = useRouter();
+  const [campaignIdInput, setCampaignIdInput] = useState("");
+  const [inputError, setInputError] = useState("");
 
-  const { address: account, isConnected } = useWeb3()
-  const { status: fhevmStatus, initialize: initializeFhevm } = useFhevm()
+  const { address: account, isConnected } = useWeb3();
+  const { status: fhevmStatus, initialize: initializeFhevm } = useFhevm();
 
   useEffect(() => {
     if (isConnected && fhevmStatus === "idle") {
-      initializeFhevm()
+      initializeFhevm();
     }
-  }, [isConnected, fhevmStatus, initializeFhevm])
+  }, [isConnected, fhevmStatus, initializeFhevm]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setCampaignIdInput(value)
+    const value = e.target.value;
+    setCampaignIdInput(value);
 
     if (value && value.trim()) {
-      const id = Number(value.trim())
+      const id = Number(value.trim());
       if (!Number.isFinite(id) || id <= 0) {
-        setInputError("Invalid Campaign ID")
+        setInputError("Invalid Campaign ID");
       } else {
-        setInputError("")
+        setInputError("");
       }
     } else {
-      setInputError("")
+      setInputError("");
     }
-  }
+  };
 
   const handleCheckNavigate = () => {
-    const trimmed = campaignIdInput.trim()
-    const id = Number(trimmed)
-    if (!trimmed || !Number.isFinite(id) || id <= 0) return
-    router.push(`/veil/campaigns/${id}`)
-  }
+    const trimmed = campaignIdInput.trim();
+    const id = Number(trimmed);
+    if (!trimmed || !Number.isFinite(id) || id <= 0) return;
+    router.push(`/veil/campaigns/${id}`);
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !inputError && campaignIdInput.trim()) {
-      handleCheckNavigate()
+      handleCheckNavigate();
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -240,5 +240,5 @@ export default function HomePage() {
         </section>
       </main>
     </div>
-  )
+  );
 }
