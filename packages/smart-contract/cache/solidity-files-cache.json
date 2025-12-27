@@ -1,9 +1,9 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/Users/hades/blockchain/zama/veil-app/interface/packages/smart-contract/contracts/VeilWhitelist.sol": {
-      "lastModificationDate": 1766661773229,
-      "contentHash": "08d7abf2f19697929c45395719b0cdbd",
+    "/Users/hades/blockchain/zama/veil-app/veil-app/packages/smart-contract/contracts/VeilWhitelist.sol": {
+      "lastModificationDate": 1766679012221,
+      "contentHash": "4770ad1acecdc5f877a3fa4c58e5c45c",
       "sourceName": "contracts/VeilWhitelist.sol",
       "solcConfig": {
         "version": "0.8.27",
@@ -49,7 +49,7 @@
         "VeilWhitelist"
       ]
     },
-    "/Users/hades/blockchain/zama/veil-app/interface/packages/smart-contract/fhevmTemp/@fhevm/solidity/config/ZamaConfig.sol": {
+    "/Users/hades/blockchain/zama/veil-app/veil-app/packages/smart-contract/fhevmTemp/@fhevm/solidity/config/ZamaConfig.sol": {
       "lastModificationDate": 1766678959665,
       "contentHash": "945d01252eaee3ca974992cce027342b",
       "sourceName": "@fhevm/solidity/config/ZamaConfig.sol",
@@ -98,7 +98,7 @@
         "ZamaEthereumConfig"
       ]
     },
-    "/Users/hades/blockchain/zama/veil-app/interface/packages/smart-contract/node_modules/@fhevm/solidity/lib/FHE.sol": {
+    "/Users/hades/blockchain/zama/veil-app/veil-app/packages/smart-contract/node_modules/@fhevm/solidity/lib/FHE.sol": {
       "lastModificationDate": 1766678922401,
       "contentHash": "6ea1c237aca19e21699bd2105d2b654f",
       "sourceName": "@fhevm/solidity/lib/FHE.sol",
@@ -148,7 +148,7 @@
         "IKMSVerifier"
       ]
     },
-    "/Users/hades/blockchain/zama/veil-app/interface/packages/smart-contract/node_modules/@fhevm/solidity/lib/Impl.sol": {
+    "/Users/hades/blockchain/zama/veil-app/veil-app/packages/smart-contract/node_modules/@fhevm/solidity/lib/Impl.sol": {
       "lastModificationDate": 1766678922401,
       "contentHash": "68866e1050079bd9720398ae0290121a",
       "sourceName": "@fhevm/solidity/lib/Impl.sol",
@@ -198,7 +198,7 @@
         "Impl"
       ]
     },
-    "/Users/hades/blockchain/zama/veil-app/interface/packages/smart-contract/node_modules/encrypted-types/EncryptedTypes.sol": {
+    "/Users/hades/blockchain/zama/veil-app/veil-app/packages/smart-contract/node_modules/encrypted-types/EncryptedTypes.sol": {
       "lastModificationDate": 1766678700453,
       "contentHash": "521a624fad71cd29fc4b7c443b41bb86",
       "sourceName": "encrypted-types/EncryptedTypes.sol",
@@ -241,7 +241,7 @@
       ],
       "artifacts": []
     },
-    "/Users/hades/blockchain/zama/veil-app/interface/packages/smart-contract/node_modules/@fhevm/solidity/lib/FheType.sol": {
+    "/Users/hades/blockchain/zama/veil-app/veil-app/packages/smart-contract/node_modules/@fhevm/solidity/lib/FheType.sol": {
       "lastModificationDate": 1766678922401,
       "contentHash": "65f472a3e319ba73ac6b19a5e8660d15",
       "sourceName": "@fhevm/solidity/lib/FheType.sol",

@@ -5,7 +5,7 @@ export type AddressMap = {
 };
 
 export const VEIL_WHITELIST_CONTRACT_ADDRESSES: AddressMap = {
-  [ChainId.SEPOLIA]: "0x233013532ae88D96634684C24D84D952b1060303",
+  [ChainId.SEPOLIA]: "0x019ac24154842df3D9D60Fb69B742F56d4D43C04",
 };
 
 export const CONTRACT_ADDRESSES = {
