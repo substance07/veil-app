@@ -8,9 +8,9 @@ A private whitelist management application built with FHEVM, allowing you to cre
 - **🛡️ Privacy Protection** - Addresses are fully encrypted and never exposed on the blockchain
 - **✅ Zero-Knowledge Verification** - Users can check whitelist status without revealing their address
 - **📦 Universal FHEVM SDK** - Framework-agnostic SDK supporting React, Next.js, Vue, and Node.js
-- **⚡ Next.js Interface** - Modern web interface with Next.js 15 and React 19
+- **⚡ Next.js Interface** - Modern web interface with Next.js 16 and React 19
 
-## 🏗️ **Kiến trúc Dự án**
+## 🏗️ **Project Architecture**
 
 ```
 veil-app/
@@ -140,16 +140,16 @@ pnpm --filter veil-interface dev
 ### **Deploy Smart Contracts**
 
 ```bash
-# Deploy lên localhost
+# Deploy to localhost
 pnpm deploy:localhost
 
-# Deploy lên Sepolia testnet
+# Deploy to Sepolia testnet
 pnpm deploy:sepolia
 ```
 
 ## 🛠️ **Development**
 
-### **Scripts chính**
+### **Main Scripts**
 
 ```bash
 # Build SDK
@@ -296,10 +296,10 @@ await contract.addToWhitelist(encrypted.encryptedData, encrypted.proof);
 ### **Smart Contract Tests**
 
 ```bash
-# Chạy tất cả tests
+# Run all tests
 pnpm hardhat:test
 
-# Chạy từ package smart-contract
+# Run from smart-contract package
 cd packages/smart-contract
 pnpm test
 ```
@@ -309,17 +309,17 @@ Tests run in Hardhat's FHEVM mock environment, allowing fast testing without a r
 ### **Frontend Tests**
 
 ```bash
-# Chạy tests cho veil-interface
+# Run tests for veil-interface
 cd packages/veil-interface
 pnpm test
 ```
 
-## 🏆 **Tính năng chính**
+## 🏆 **Key Features**
 
 ### **✅ Universal FHEVM SDK**
 - Framework-agnostic core
-- Adapters cho React, Vue, và Node.js
-- TypeScript support đầy đủ
+- Adapters for React, Vue, and Node.js
+- Full TypeScript support
 - Wagmi-like API pattern
 
 ### **✅ Private Whitelist Management**
@@ -335,11 +335,11 @@ pnpm test
 - Real blockchain interactions
 
 ### **✅ Modern Tech Stack**
-- Next.js 15 với App Router
+- Next.js 16 with App Router
 - React 19
 - TypeScript
 - Tailwind CSS
-- Wagmi & Viem cho Web3
+- Wagmi & Viem for Web3
 
 ## 📋 **Contract Details**
 

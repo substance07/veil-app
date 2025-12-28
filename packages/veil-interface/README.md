@@ -2,7 +2,7 @@
 
 > An encrypted whitelist management system for campaigns using Fully Homomorphic Encryption (FHE) technology.
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.4.2-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.1.0-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -44,7 +44,7 @@
 
 ### Frontend
 
-- **Framework**: [Next.js 15.4.2](https://nextjs.org/) with App Router
+- **Framework**: [Next.js 16.1.1](https://nextjs.org/) with App Router
 - **UI Library**: [React 19.1.0](https://react.dev/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
 - **UI Components**: [Radix UI](https://www.radix-ui.com/) primitives
