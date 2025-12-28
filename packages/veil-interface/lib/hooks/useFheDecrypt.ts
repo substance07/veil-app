@@ -54,7 +54,7 @@ async function createUserDecryptSignature(
     eip712.message
   );
 
-  // Signature không được có prefix "0x"
+  // Signature must not have "0x" prefix
   return signature.replace("0x", "");
 }
 
@@ -177,7 +177,7 @@ export function useDecrypt() {
           throw new Error("Decryption returned null or undefined");
         }
 
-        // Address có thể là string hoặc bytes32, chuyển về string
+        // Address can be string or bytes32, convert to string
         if (typeof value === "string") {
           return value;
         }
@@ -239,7 +239,7 @@ export function useDecrypt() {
         // Generate or use keypair from options
         const keypair = options?.keypair || instance.generateKeypair();
 
-        // Set validity từ options hoặc default
+        // Set validity from options or default
         const validity = options?.validity || {};
         const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString();
         const durationDays = validity.durationDays || "1";
@@ -256,7 +256,7 @@ export function useDecrypt() {
           durationDays
         );
 
-        // Gọi userDecrypt
+        // Call userDecrypt
         const handleContractPairs: HandleContractPair[] = [
           {
             handle: handleBytes32,
@@ -335,7 +335,7 @@ export function useDecrypt() {
         // Generate or use keypair from options
         const keypair = options?.keypair || instance.generateKeypair();
 
-        // Set validity từ options hoặc default
+        // Set validity from options or default
         const validity = options?.validity || {};
         const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString();
         const durationDays = validity.durationDays || "1";
@@ -352,7 +352,7 @@ export function useDecrypt() {
           durationDays
         );
 
-        // Gọi userDecrypt
+        // Call userDecrypt
         const handleContractPairs: HandleContractPair[] = [
           {
             handle: handleBytes32,
@@ -430,7 +430,7 @@ export function useDecrypt() {
         // Generate or use keypair from options
         const keypair = options?.keypair || instance.generateKeypair();
 
-        // Set validity từ options hoặc default
+        // Set validity from options or default
         const validity = options?.validity || {};
         const startTimestamp = validity.startTimestamp || Math.floor(Date.now() / 1000).toString();
         const durationDays = validity.durationDays || "1";
@@ -447,7 +447,7 @@ export function useDecrypt() {
           durationDays
         );
 
-        // Gọi userDecrypt
+        // Call userDecrypt
         const handleContractPairs: HandleContractPair[] = [
           {
             handle: handleBytes32,
@@ -472,7 +472,7 @@ export function useDecrypt() {
           throw new Error("Decryption returned null or undefined");
         }
 
-        // Address có thể là string hoặc bytes32, chuyển về string
+        // Address can be string or bytes32, convert to string
         if (typeof value === "string") {
           return value;
         }

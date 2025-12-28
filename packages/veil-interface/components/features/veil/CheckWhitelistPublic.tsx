@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { useDecrypt, useFheInstance } from "@/lib/hooks";
+import { useDecrypt, useFheInstance, useFhevm } from "@/lib/hooks";
 import useContract from "@/lib/hooks/useContract";
 import { useEthersProvider, useEthersSigner } from "@/lib/hooks";
 import { VEIL_WHITELIST_CONTRACT_ADDRESSES } from "@/web3/core/constants/veil";
@@ -26,6 +26,7 @@ export function CheckWhitelistPublic({ campaignId, chainId, onMessage }: CheckWh
 
   const { publicDecryptEbool, isDecrypting, error: decryptError } = useDecrypt();
   const fheInstance = useFheInstance();
+  const { status: fhevmStatus } = useFhevm();
   const provider = useEthersProvider({ chainId });
   const signer = useEthersSigner({ chainId });
   const appKit = useAppKit();
@@ -245,6 +246,25 @@ export function CheckWhitelistPublic({ campaignId, chainId, onMessage }: CheckWh
     return (
       <div className="info-card border-destructive/30">
         <p className="text-destructive text-sm text-center">Contract not deployed on this chain</p>
+      </div>
+    );
+  }
+
+  if (fhevmStatus === "initializing" || !fheInstance) {
+    return (
+      <div className="info-card">
+        <div className="flex flex-col items-center justify-center py-12">
+          <svg className="w-12 h-12 animate-spin text-primary mb-4" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <p className="text-muted-foreground text-sm font-medium">Initializing FHE...</p>
+          <p className="text-muted-foreground text-xs mt-2">Please wait a moment</p>
+        </div>
       </div>
     );
   }

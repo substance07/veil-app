@@ -79,7 +79,22 @@ export default function VeilCampaignCheckPage({ params }: { params: Promise<{ id
           <p className="text-muted-foreground">Check whitelist for this campaign</p>
         </div>
 
-        {Number.isFinite(campaignId) && campaignId > 0 ? (
+        {fhevmStatus === "initializing" ? (
+          <div className="info-card">
+            <div className="flex flex-col items-center justify-center py-12">
+              <svg className="w-12 h-12 animate-spin text-primary mb-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              <p className="text-muted-foreground text-sm font-medium">Initializing FHE...</p>
+              <p className="text-muted-foreground text-xs mt-2">Please wait a moment</p>
+            </div>
+          </div>
+        ) : Number.isFinite(campaignId) && campaignId > 0 ? (
           <CheckWhitelistPublic campaignId={campaignId} chainId={targetChainId} onMessage={setMessage} />
         ) : (
           <div className="info-card border-destructive/30">

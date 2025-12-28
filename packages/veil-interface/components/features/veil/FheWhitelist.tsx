@@ -54,6 +54,8 @@ export function FheWhitelist({
 
   const [isEncrypting, setIsEncrypting] = useState(false);
   const [encryptError, setEncryptError] = useState<string>("");
+  const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
+  const [isLoadingCampaignData, setIsLoadingCampaignData] = useState(false);
   const { userDecryptEbool, isDecrypting, error: decryptError } = useDecrypt();
   const fheInstance = useFheInstance();
 
@@ -142,6 +144,7 @@ export function FheWhitelist({
       return;
     }
 
+    setIsLoadingCampaigns(true);
     try {
       const count = await readContract.campaignCount();
       const campaignCountNum = Number(count);
@@ -191,6 +194,8 @@ export function FheWhitelist({
       }
     } catch (error) {
       console.error("Failed to load campaigns:", error);
+    } finally {
+      setIsLoadingCampaigns(false);
     }
   };
 
@@ -199,6 +204,7 @@ export function FheWhitelist({
       return;
     }
 
+    setIsLoadingCampaignData(true);
     try {
       const campaignInfo = await readContract.getCampaignInfo(campaignId);
       const isOwnerResult = await readContract.isCampaignOwner(campaignId, account);
@@ -226,6 +232,8 @@ export function FheWhitelist({
       if (error instanceof Error && error.message.includes("CampaignNotFound")) {
         onMessage("Campaign not found");
       }
+    } finally {
+      setIsLoadingCampaignData(false);
     }
   };
 
@@ -274,24 +282,46 @@ export function FheWhitelist({
       }
 
       onMessage("Checking whitelist...");
-      const result = await writeContract.checkAccessAll(
+      const tx = await writeContract.checkAccessAll(
         selectedCampaignId,
         encryptedInput.encryptedData,
         encryptedInput.proof
       );
 
-      if (!result) {
-        throw new Error("No result returned from contract");
+      onMessage("Waiting for transaction confirmation...");
+      const receipt = await tx.wait();
+
+      if (!receipt) {
+        throw new Error("Transaction not confirmed");
       }
 
-      setCheckHandle(result);
+      onMessage("Reading result from contract...");
+      const encryptedResult = await writeContract.getMyLastCheck(selectedCampaignId);
+
+      if (!encryptedResult) {
+        throw new Error("No result received from contract");
+      }
+
+      const handleString =
+        typeof encryptedResult === "string"
+          ? encryptedResult.startsWith("0x")
+            ? encryptedResult
+            : `0x${encryptedResult}`
+          : String(encryptedResult);
+
+      if (handleString.length !== 66 || !handleString.startsWith("0x")) {
+        console.error("Invalid handle format:", handleString);
+        throw new Error(`Invalid handle: ${handleString.substring(0, 20)}...`);
+      }
+
+      setCheckHandle(handleString);
       onMessage("Decrypting result...");
 
       if (!signer) {
         throw new Error("Signer is required for decryption");
       }
 
-      const isWhitelisted = await userDecryptEbool(result, contractAddress, signer);
+      const isWhitelisted = await userDecryptEbool(handleString, contractAddress, signer);
       setCheckResult(isWhitelisted);
 
       onMessage(`Whitelist check completed: ${isWhitelisted ? "Whitelisted" : "Not whitelisted"}`);
@@ -442,8 +472,29 @@ export function FheWhitelist({
     }
   };
 
-  if (!isConnected || !isInitialized) {
+  if (!isConnected) {
     return null;
+  }
+
+  if (!isInitialized) {
+    return (
+      <div className="w-full">
+        <div className="info-card">
+          <div className="flex flex-col items-center justify-center py-12">
+            <svg className="w-12 h-12 animate-spin text-primary mb-4" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            <p className="text-muted-foreground text-sm font-medium">Initializing FHE...</p>
+            <p className="text-muted-foreground text-xs mt-2">Please wait a moment</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!contractAddress) {
@@ -490,18 +541,49 @@ export function FheWhitelist({
               />
             </div>
 
-            <CampaignsList
-              campaigns={campaigns}
-              selectedCampaignId={selectedCampaignId}
-              onSelectCampaign={setSelectedCampaignId}
-              account={account}
-            />
+            {isLoadingCampaigns ? (
+              <div className="info-card">
+                <div className="flex flex-col items-center justify-center py-8">
+                  <svg className="w-8 h-8 animate-spin text-primary mb-3" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  <p className="text-muted-foreground text-sm">Loading campaigns list...</p>
+                </div>
+              </div>
+            ) : (
+              <CampaignsList
+                campaigns={campaigns}
+                selectedCampaignId={selectedCampaignId}
+                onSelectCampaign={setSelectedCampaignId}
+                account={account}
+              />
+            )}
           </div>
         )}
 
-        {selectedCampaign && (
+        {isLoadingCampaignData && selectedCampaignId ? (
           <div className="info-card">
-            <h3 className="text-lg font-bold text-foreground mb-4">Campaign Information</h3>
+            <div className="flex flex-col items-center justify-center py-8">
+              <svg className="w-8 h-8 animate-spin text-primary mb-3" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              <p className="text-muted-foreground text-sm">Loading campaign information...</p>
+            </div>
+          </div>
+        ) : (
+          selectedCampaign && (
+            <div className="info-card">
+              <h3 className="text-lg font-bold text-foreground mb-4">Campaign Information</h3>
 
             <div className="mb-6 p-4 bg-card rounded-xl border-2 border-border">
               <div className="text-muted-foreground text-xs font-medium mb-2">Shareable Check Link</div>
@@ -578,9 +660,10 @@ export function FheWhitelist({
               </div>
             </div>
           </div>
+          )
         )}
 
-        {!selectedCampaign && campaigns.length > 0 && (
+        {!selectedCampaign && campaigns.length > 0 && !isLoadingCampaignData && (
           <div className="info-card text-center py-8">
             <svg
               className="w-12 h-12 mx-auto mb-3 text-neutral-300"
