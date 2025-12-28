@@ -1,8 +1,3 @@
-/**
- * Node.js Adapter - Universal FHEVM SDK
- * Real server-side FHEVM operations with RPC and private key support
- */
-
 import { 
   initializeFheInstance, 
   getFheInstance, 
@@ -19,9 +14,6 @@ export interface FhevmNodeOptions {
   chainId?: number;
 }
 
-/**
- * Enhanced Node.js FHEVM manager with server-side capabilities
- */
 export class FhevmNode {
   private instance: any = null;
   private isReady = false;
@@ -30,9 +22,12 @@ export class FhevmNode {
   private options: FhevmNodeOptions;
 
   constructor(options: FhevmNodeOptions = {}) {
+    const defaultRpcUrl = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_RPC_URL) ||
+      'https://ethereum-sepolia-rpc.publicnode.com';
+    
     this.options = {
-      rpcUrl: options.rpcUrl || 'https://sepolia.infura.io/v3/YOUR_INFURA_KEY',
-      chainId: options.chainId || 11155111, // Sepolia
+      rpcUrl: options.rpcUrl || defaultRpcUrl,
+      chainId: options.chainId || 11155111,
       ...options
     };
   }
@@ -41,13 +36,23 @@ export class FhevmNode {
     try {
       console.log('🚀 Initializing FHEVM Node.js instance...');
       
-      // Initialize FHEVM with RPC URL
+      if (!this.options.rpcUrl || typeof this.options.rpcUrl !== 'string' || !this.options.rpcUrl.startsWith('http')) {
+        throw new Error(`Invalid RPC URL: ${this.options.rpcUrl}. Please provide a valid RPC URL.`);
+      }
+      
       this.instance = await initializeFheInstance({ 
         rpcUrl: this.options.rpcUrl 
       });
       
-      // Setup provider and wallet for server-side operations
-      this.provider = new ethers.JsonRpcProvider(this.options.rpcUrl);
+      try {
+        this.provider = new ethers.JsonRpcProvider(this.options.rpcUrl);
+        
+        const network = await this.provider.getNetwork();
+        console.log(`✅ Provider connected to network: ${network.name} (chainId: ${network.chainId})`);
+      } catch (providerError: any) {
+        console.error('❌ Failed to create RPC provider:', providerError.message);
+        throw new Error(`RPC connection failed: ${providerError.message}. Please check your RPC URL: ${this.options.rpcUrl}`);
+      }
       
       if (this.options.privateKey) {
         this.wallet = new ethers.Wallet(this.options.privateKey, this.provider);
@@ -73,7 +78,6 @@ export class FhevmNode {
   async decrypt(handle: string, contractAddress: string, signer?: any) {
     if (!this.isReady) throw new Error('FHEVM not initialized');
     
-    // Use provided signer or default wallet
     const signerToUse = signer || this.wallet;
     if (!signerToUse) {
       throw new Error('No signer available. Provide a signer or initialize with privateKey');
@@ -92,7 +96,6 @@ export class FhevmNode {
   async decryptMultiple(contractAddress: string, handles: string[], signer?: any) {
     if (!this.isReady) throw new Error('FHEVM not initialized');
     
-    // Use provided signer or default wallet
     const signerToUse = signer || this.wallet;
     if (!signerToUse) {
       throw new Error('No signer available. Provide a signer or initialize with privateKey');
@@ -102,9 +105,6 @@ export class FhevmNode {
     return decryptMultipleHandles(contractAddress, signerToUse, handles);
   }
 
-  /**
-   * Create a contract instance for server-side interactions
-   */
   createContract(address: string, abi: any[]) {
     if (!this.provider) throw new Error('Provider not initialized');
     if (!this.wallet) throw new Error('Wallet not initialized - provide privateKey');
@@ -112,10 +112,6 @@ export class FhevmNode {
     return new ethers.Contract(address, abi, this.wallet);
   }
 
-  /**
-   * Execute encrypted transaction
-   * Supports both old format (encryptedData, proof) and new FHEVM 0.9.0 format (handles, inputProof)
-   */
   async executeEncryptedTransaction(
     contract: ethers.Contract,
     methodName: string,
@@ -127,20 +123,16 @@ export class FhevmNode {
     console.log(`📝 Executing encrypted transaction: ${methodName}`);
     
     try {
-      // Handle new FHEVM 0.9.0 format (handles array + inputProof)
       let handle: any, proof: any;
       
       if (encryptedData && typeof encryptedData === 'object') {
         if (encryptedData.handles && Array.isArray(encryptedData.handles) && encryptedData.handles.length > 0) {
-          // New format: { handles: [Uint8Array], inputProof: Uint8Array }
           handle = encryptedData.handles[0];
           proof = encryptedData.inputProof;
         } else if (encryptedData.encryptedData && encryptedData.proof) {
-          // Old format: { encryptedData: any, proof: any }
           handle = encryptedData.encryptedData;
           proof = encryptedData.proof;
         } else {
-          // Fallback: assume it's the handle itself
           handle = encryptedData;
           proof = encryptedData;
         }
@@ -149,7 +141,6 @@ export class FhevmNode {
         proof = encryptedData;
       }
       
-      // Convert Uint8Array to hex string if needed
       if (handle instanceof Uint8Array) {
         handle = ethers.hexlify(handle);
       }
@@ -174,24 +165,15 @@ export class FhevmNode {
     }
   }
 
-  /**
-   * Get wallet address
-   */
   async getAddress(): Promise<string | null> {
     if (!this.wallet) return null;
     return this.wallet.getAddress();
   }
 
-  /**
-   * Get provider
-   */
   getProvider() {
     return this.provider;
   }
 
-  /**
-   * Get wallet
-   */
   getWallet() {
     return this.wallet;
   }
@@ -204,9 +186,6 @@ export class FhevmNode {
     return this.isReady ? 'ready' : 'idle';
   }
 
-  /**
-   * Get configuration info
-   */
   getConfig() {
     return {
       rpcUrl: this.options.rpcUrl,

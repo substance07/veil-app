@@ -1,6 +1,3 @@
-/**
- * Wagmi-like hook for decryption operations
- */
 export declare function useDecrypt(): {
     decrypt: (handle: string, contractAddress: string, signer: any) => Promise<number>;
     publicDecrypt: (handle: string) => Promise<number>;

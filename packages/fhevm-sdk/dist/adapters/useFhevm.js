@@ -1,6 +1,3 @@
-/**
- * Wagmi-like hook for FHEVM instance
- */
 import { useState, useCallback } from 'react';
 import { initializeFheInstance } from '../core/index.js';
 export function useFhevm() {
@@ -8,6 +5,10 @@ export function useFhevm() {
     const [status, setStatus] = useState('idle');
     const [error, setError] = useState('');
     const initialize = useCallback(async () => {
+        if (status === 'ready' || status === 'loading') {
+            console.log(`⏭️ Skipping FHEVM initialization - status: ${status}`);
+            return;
+        }
         setStatus('loading');
         setError('');
         try {
@@ -21,7 +22,7 @@ export function useFhevm() {
             setStatus('error');
             console.error('❌ FHEVM initialization failed:', err);
         }
-    }, []);
+    }, [status]);
     return {
         instance,
         status,

@@ -1,16 +1,9 @@
-/**
- * Node.js Adapter - Universal FHEVM SDK
- * Real server-side FHEVM operations with RPC and private key support
- */
 import { ethers } from 'ethers';
 export interface FhevmNodeOptions {
     rpcUrl?: string;
     privateKey?: string;
     chainId?: number;
 }
-/**
- * Enhanced Node.js FHEVM manager with server-side capabilities
- */
 export declare class FhevmNode {
     private instance;
     private isReady;
@@ -30,32 +23,13 @@ export declare class FhevmNode {
         decryptionProof: string;
         values: number[];
     }>;
-    /**
-     * Create a contract instance for server-side interactions
-     */
     createContract(address: string, abi: any[]): ethers.Contract;
-    /**
-     * Execute encrypted transaction
-     * Supports both old format (encryptedData, proof) and new FHEVM 0.9.0 format (handles, inputProof)
-     */
     executeEncryptedTransaction(contract: ethers.Contract, methodName: string, encryptedData: any, ...additionalParams: any[]): Promise<any>;
-    /**
-     * Get wallet address
-     */
     getAddress(): Promise<string | null>;
-    /**
-     * Get provider
-     */
     getProvider(): ethers.JsonRpcProvider | null;
-    /**
-     * Get wallet
-     */
     getWallet(): ethers.Wallet | null;
     getInstance(): any;
     getStatus(): "idle" | "ready";
-    /**
-     * Get configuration info
-     */
     getConfig(): {
         rpcUrl: string | undefined;
         chainId: number | undefined;

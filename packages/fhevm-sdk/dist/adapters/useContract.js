@@ -1,6 +1,3 @@
-/**
- * Wagmi-like hook for contract interactions
- */
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 export function useContract(address, abi) {

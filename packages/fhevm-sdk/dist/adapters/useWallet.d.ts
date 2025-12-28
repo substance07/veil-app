@@ -1,6 +1,3 @@
-/**
- * Wagmi-like hook for wallet connection
- */
 export declare function useWallet(): {
     address: string;
     isConnected: boolean;

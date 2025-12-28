@@ -1,9 +1,3 @@
-/**
- * React Adapter - Universal FHEVM SDK
- * Wagmi-like React hooks for FHEVM operations
- *
- * This file re-exports all React hooks from individual files for a clean structure.
- */
 export { useWallet } from './useWallet.js';
 export { useFhevm } from './useFhevm.js';
 export { useContract } from './useContract.js';

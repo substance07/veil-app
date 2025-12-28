@@ -1,7 +1,3 @@
-/**
- * Wagmi-like hook for decryption operations
- */
-
 import { useState, useCallback } from 'react';
 import { decryptValue, publicDecrypt, decryptMultipleHandles } from '../core/index.js';
 

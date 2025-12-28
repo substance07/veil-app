@@ -1,6 +1,3 @@
-/**
- * Wagmi-like hook for encryption operations
- */
 import { useState, useCallback } from 'react';
 import { createEncryptedInput } from '../core/index.js';
 export function useEncrypt() {

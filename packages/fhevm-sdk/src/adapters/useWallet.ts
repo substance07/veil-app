@@ -1,7 +1,3 @@
-/**
- * Wagmi-like hook for wallet connection
- */
-
 import { useState, useCallback, useEffect } from 'react';
 
 export function useWallet() {
@@ -11,7 +7,6 @@ export function useWallet() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string>('');
 
-  // Listen for chain changes
   useEffect(() => {
     if (!window.ethereum) return;
 
@@ -23,7 +18,6 @@ export function useWallet() {
 
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
-        // User disconnected
         setAddress('');
         setIsConnected(false);
         setChainId(0);
