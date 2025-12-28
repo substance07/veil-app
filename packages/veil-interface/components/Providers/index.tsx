@@ -31,7 +31,7 @@ export const appKit = createAppKit({
     // socials: false,
     // email: false,
   },
-  themeMode: "light",
+  themeMode: "dark",
   themeVariables: {
     "--w3m-accent": "var(--primary)",
     "--w3m-border-radius-master": "1px",

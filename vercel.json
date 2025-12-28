@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd ../.. && pnpm install --frozen-lockfile && pnpm build",
-  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "outputDirectory": ".next"
-}
-

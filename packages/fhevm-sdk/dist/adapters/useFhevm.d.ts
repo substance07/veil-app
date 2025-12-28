@@ -3,7 +3,7 @@
  */
 export declare function useFhevm(): {
     instance: any;
-    status: "error" | "idle" | "loading" | "ready";
+    status: "idle" | "loading" | "ready" | "error";
     error: string;
     initialize: () => Promise<void>;
     isInitialized: boolean;

@@ -17,9 +17,6 @@ export const wagmiAdapter = new WagmiAdapter({
   ssr: true,
   projectId,
   networks,
-  // storage: createStorage({
-  //   storage: cookieStorage,
-  // }),
 });
 
 export const wagmiConfig = wagmiAdapter.wagmiConfig;

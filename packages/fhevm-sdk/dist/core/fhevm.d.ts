@@ -49,6 +49,8 @@ export declare function createEncryptedInput(contractAddress: string, userAddres
  * Returns the decrypted number value
  * @param {string} encryptedBytes - Single handle to decrypt
  * @returns {Promise<number>} Decrypted number value
+ *
+ * ⚠️ DEMO MODE: Auto returns 1 (true) for demo purposes
  */
 export declare function publicDecrypt(encryptedBytes: string): Promise<number>;
 /**
