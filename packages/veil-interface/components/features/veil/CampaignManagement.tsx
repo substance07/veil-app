@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { useDecrypt, useFheInstance } from "@/lib/hooks";
+import { useFheInstance } from "@/lib/hooks";
 import useContract from "@/lib/hooks/useContract";
 import { useEthersSigner } from "@/lib/hooks";
 import { VEIL_WHITELIST_CONTRACT_ADDRESSES } from "@/web3/core/constants/veil";
@@ -13,7 +13,7 @@ import { CampaignsList } from "./CampaignsList";
 
 type WhitelistMode = "manage" | "check" | "all";
 
-interface FheWhitelistProps {
+interface CampaignManagementProps {
   account: string;
   chainId: number;
   isConnected: boolean;
@@ -31,7 +31,7 @@ interface Campaign {
   whitelistSize: number;
 }
 
-export function FheWhitelist({
+export function CampaignManagement({
   account,
   chainId,
   isConnected,
@@ -39,16 +39,13 @@ export function FheWhitelist({
   onMessage,
   mode = "all",
   initialCampaignId,
-}: FheWhitelistProps) {
+}: CampaignManagementProps) {
   const [campaignCount, setCampaignCount] = useState<number>(0);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(initialCampaignId ?? null);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [isOwner, setIsOwner] = useState<boolean>(false);
-  const [isChecking, setIsChecking] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const [checkResult, setCheckResult] = useState<boolean | null>(null);
-  const [checkHandle, setCheckHandle] = useState<string>("");
   const [addressesInput, setAddressesInput] = useState<string>("");
   const [linkCopied, setLinkCopied] = useState(false);
 
@@ -56,7 +53,6 @@ export function FheWhitelist({
   const [encryptError, setEncryptError] = useState<string>("");
   const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
   const [isLoadingCampaignData, setIsLoadingCampaignData] = useState(false);
-  const { userDecryptEbool, isDecrypting, error: decryptError } = useDecrypt();
   const fheInstance = useFheInstance();
 
   const contractAddress = VEIL_WHITELIST_CONTRACT_ADDRESSES[chainId as keyof typeof VEIL_WHITELIST_CONTRACT_ADDRESSES];
@@ -126,7 +122,6 @@ export function FheWhitelist({
   };
 
   const showManagement = mode !== "check";
-  const showCheck = mode !== "manage";
 
   const handleCopyLink = async (link: string) => {
     if (!link || typeof navigator === "undefined" || !navigator.clipboard) return;
@@ -256,99 +251,6 @@ export function FheWhitelist({
       loadCampaignData(selectedCampaignId);
     }
   }, [selectedCampaignId, isConnected, isInitialized, account, readContract]);
-
-  const checkAccess = async () => {
-    if (!isConnected || !readContract || !writeContract || !selectedCampaignId || !contractAddress) {
-      onMessage("Please select a campaign first");
-      return;
-    }
-
-    if (!account) {
-      onMessage("Please connect your wallet");
-      return;
-    }
-
-    try {
-      setIsChecking(true);
-      setCheckResult(null);
-      setCheckHandle("");
-      onMessage("Encrypting address...");
-
-      onMessage("Encrypting address for whitelist check...");
-      const encryptedInput = await encryptAddress(contractAddress, account, account);
-
-      if (!encryptedInput || !encryptedInput.encryptedData || !encryptedInput.proof) {
-        throw new Error("Failed to encrypt address");
-      }
-
-      onMessage("Checking whitelist...");
-      const tx = await writeContract.checkAccessAll(
-        selectedCampaignId,
-        encryptedInput.encryptedData,
-        encryptedInput.proof
-      );
-
-      onMessage("Waiting for transaction confirmation...");
-      const receipt = await tx.wait();
-
-      if (!receipt) {
-        throw new Error("Transaction not confirmed");
-      }
-
-      onMessage("Reading result from contract...");
-      const encryptedResult = await writeContract.getMyLastCheck(selectedCampaignId);
-
-      if (!encryptedResult) {
-        throw new Error("No result received from contract");
-      }
-
-      const handleString =
-        typeof encryptedResult === "string"
-          ? encryptedResult.startsWith("0x")
-            ? encryptedResult
-            : `0x${encryptedResult}`
-          : String(encryptedResult);
-
-      if (handleString.length !== 66 || !handleString.startsWith("0x")) {
-        console.error("Invalid handle format:", handleString);
-        throw new Error(`Invalid handle: ${handleString.substring(0, 20)}...`);
-      }
-
-      setCheckHandle(handleString);
-      onMessage("Decrypting result...");
-
-      if (!signer) {
-        throw new Error("Signer is required for decryption");
-      }
-
-      const isWhitelisted = await userDecryptEbool(handleString, contractAddress, signer);
-      setCheckResult(isWhitelisted);
-
-      onMessage(`Whitelist check completed: ${isWhitelisted ? "Whitelisted" : "Not whitelisted"}`);
-      setTimeout(() => onMessage(""), 3000);
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const errorString = errorMessage.toLowerCase();
-
-      console.error("Check access failed:", error);
-
-      if (errorString.includes("campaignnotfound")) {
-        onMessage("Campaign not found");
-      } else if (errorString.includes("fhe instance not initialized") || errorString.includes("fhe")) {
-        onMessage("FHE instance not initialized. Please wait for initialization.");
-      } else if (errorString.includes("encrypt") || errorString.includes("encryption")) {
-        onMessage(`Encryption failed: ${errorMessage}`);
-      } else if (errorString.includes("decrypt") || errorString.includes("decryption")) {
-        onMessage(`Decryption failed: ${errorMessage}`);
-      } else if (errorString.includes("user rejected") || errorString.includes("denied")) {
-        onMessage("Transaction was rejected");
-      } else {
-        onMessage(`Check access failed: ${errorMessage}`);
-      }
-    } finally {
-      setIsChecking(false);
-    }
-  };
 
   const addToWhitelist = async () => {
     if (!isConnected || !isOwner || !selectedCampaignId || !writeContract || !contractAddress) {
@@ -529,8 +431,6 @@ export function FheWhitelist({
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-bold text-neutral-900">Campaign Management</h2>
-                <p className="text-neutral-600 text-sm">Create and manage your encrypted whitelist campaigns</p>
               </div>
               <CreateCampaign
                 writeContract={writeContract}
@@ -679,88 +579,6 @@ export function FheWhitelist({
               />
             </svg>
             <p className="text-muted-foreground text-sm">Please select a campaign to view details</p>
-          </div>
-        )}
-
-        {selectedCampaign && showCheck && (
-          <div className="info-card">
-            <h3 className="text-lg font-bold text-foreground mb-4">Check Whitelist Access</h3>
-            <button
-              onClick={checkAccess}
-              disabled={isChecking || isEncrypting || isDecrypting || !selectedCampaignId}
-              className="btn-primary w-full"
-              title={encryptError || decryptError || undefined}
-            >
-              {isChecking || isEncrypting || isDecrypting ? (
-                <>
-                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Checking...
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  Check My Access
-                </>
-              )}
-            </button>
-
-            {checkHandle && (
-              <div className="mt-4 p-4 bg-card rounded-xl border-2 border-border">
-                <span className="text-muted-foreground text-xs font-medium block mb-2">Encrypted Result Handle</span>
-                <code className="text-foreground text-xs font-mono break-all">{checkHandle}</code>
-              </div>
-            )}
-
-            {checkResult !== null && (
-              <div
-                className={`mt-4 p-4 rounded-xl border-2 ${checkResult ? "border-accent/30 bg-accent/5" : "border-destructive/30 bg-destructive/5"}`}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground text-sm font-medium">Whitelist Status</span>
-                  <span
-                    className={`text-lg font-bold flex items-center gap-2 ${checkResult ? "text-accent" : "text-destructive"}`}
-                  >
-                    {checkResult ? (
-                      <>
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Whitelisted
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Not Whitelisted
-                      </>
-                    )}
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
         )}
 

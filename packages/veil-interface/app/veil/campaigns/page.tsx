@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import useWeb3 from "@/lib/hooks/useWeb3";
 import { useFhevm } from "@/lib/hooks";
 import { MainNav } from "@/components/layout/MainNav";
-import { FheWhitelist } from "@/components/features/veil/FheWhitelist";
+import { CampaignManagement } from "@/components/features/veil/CampaignManagement";
 
 export default function VeilCampaignManagementPage() {
   const [message, setMessage] = useState<string>("");
@@ -63,7 +63,7 @@ export default function VeilCampaignManagementPage() {
             </div>
           </div>
         ) : (
-          <FheWhitelist
+          <CampaignManagement
             account={account || ""}
             chainId={chainId || 0}
             isConnected={isConnected}

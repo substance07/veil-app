@@ -1,7 +1,13 @@
-export declare function useFhevm(): {
+type InitializeOptions = {
+    rpcUrl?: string;
+    maxRetries?: number;
+    retryDelayMs?: number;
+};
+export declare function useFhevm(options?: InitializeOptions): {
     instance: any;
-    status: "error" | "idle" | "loading" | "ready";
+    status: "idle" | "loading" | "ready" | "error";
     error: string;
     initialize: () => Promise<void>;
     isInitialized: boolean;
 };
+export {};

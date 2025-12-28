@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { initializeFheInstance } from '../core/index.js';
-export function useFhevm() {
+export function useFhevm(options) {
     const [instance, setInstance] = useState(null);
     const [status, setStatus] = useState('idle');
     const [error, setError] = useState('');
@@ -12,7 +12,7 @@ export function useFhevm() {
         setStatus('loading');
         setError('');
         try {
-            const fheInstance = await initializeFheInstance();
+            const fheInstance = await initializeFheInstance(options);
             setInstance(fheInstance);
             setStatus('ready');
             console.log('✅ FHEVM initialized');
@@ -22,7 +22,7 @@ export function useFhevm() {
             setStatus('error');
             console.error('❌ FHEVM initialization failed:', err);
         }
-    }, [status]);
+    }, [status, options]);
     return {
         instance,
         status,

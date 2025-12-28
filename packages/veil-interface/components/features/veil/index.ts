@@ -1,1 +1,1 @@
-export { FheWhitelist } from "./FheWhitelist";
+export { CampaignManagement } from "./CampaignManagement";

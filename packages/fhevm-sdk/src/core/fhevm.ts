@@ -1,7 +1,26 @@
 let fheInstance: any = null;
 let initializationPromise: Promise<any> | null = null;
 
-export async function initializeFheInstance(options?: { rpcUrl?: string }) {
+// Retry helper function
+async function retry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  delayMs: number = 1000,
+  attempt: number = 1
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    if (attempt >= maxRetries) {
+      throw error;
+    }
+    console.log(`🔄 Retrying FHE initialization (attempt ${attempt + 1}/${maxRetries})...`);
+    await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+    return retry(fn, maxRetries, delayMs, attempt + 1);
+  }
+}
+
+export async function initializeFheInstance(options?: { rpcUrl?: string; maxRetries?: number; retryDelayMs?: number }) {
   if (fheInstance) {
     console.log('♻️ Reusing existing FHEVM instance');
     return fheInstance;
@@ -12,12 +31,23 @@ export async function initializeFheInstance(options?: { rpcUrl?: string }) {
     return initializationPromise;
   }
 
+  const maxRetries = options?.maxRetries ?? 3;
+  const retryDelayMs = options?.retryDelayMs ?? 1000;
+
   initializationPromise = (async () => {
     try {
       if (typeof window !== 'undefined' && window.ethereum) {
-        fheInstance = await initializeBrowserFheInstance();
+        fheInstance = await retry(
+          () => initializeBrowserFheInstance(),
+          maxRetries,
+          retryDelayMs
+        );
       } else {
-        fheInstance = await initializeNodeFheInstance(options?.rpcUrl);
+        fheInstance = await retry(
+          () => initializeNodeFheInstance(options?.rpcUrl),
+          maxRetries,
+          retryDelayMs
+        );
       }
       return fheInstance;
     } catch (error) {

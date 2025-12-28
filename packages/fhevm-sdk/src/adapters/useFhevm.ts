@@ -1,7 +1,13 @@
 import { useState, useCallback } from 'react';
 import { initializeFheInstance } from '../core/index.js';
 
-export function useFhevm() {
+type InitializeOptions = {
+  rpcUrl?: string;
+  maxRetries?: number;
+  retryDelayMs?: number;
+};
+
+export function useFhevm(options?: InitializeOptions) {
   const [instance, setInstance] = useState<any>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [error, setError] = useState<string>('');
@@ -16,7 +22,7 @@ export function useFhevm() {
     setError('');
     
     try {
-      const fheInstance = await initializeFheInstance();
+      const fheInstance = await initializeFheInstance(options);
       setInstance(fheInstance);
       setStatus('ready');
       console.log('✅ FHEVM initialized');
@@ -25,7 +31,7 @@ export function useFhevm() {
       setStatus('error');
       console.error('❌ FHEVM initialization failed:', err);
     }
-  }, [status]);
+  }, [status, options]);
 
   return {
     instance,

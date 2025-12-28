@@ -1,5 +1,7 @@
 export declare function initializeFheInstance(options?: {
     rpcUrl?: string;
+    maxRetries?: number;
+    retryDelayMs?: number;
 }): Promise<any>;
 export declare function getFheInstance(): any;
 export declare function decryptValue(encryptedBytes: string, contractAddress: string, signer: any): Promise<number>;
