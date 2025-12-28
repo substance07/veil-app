@@ -134,7 +134,7 @@ pnpm start
 # or
 pnpm --filter veil-interface dev
 
-# Interface will run at http://localhost:3000
+# Interface will run at http://localhost:9099
 ```
 
 ### **Deploy Smart Contracts**

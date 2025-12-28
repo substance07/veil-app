@@ -120,7 +120,7 @@ pnpm dev
 
 6. **Open your browser**
 
-Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
+Navigate to [http://localhost:9099](http://localhost:9099) to see the application.
 
 ### Available Scripts
 
