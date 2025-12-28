@@ -272,9 +272,6 @@ export function CheckWhitelistPublic({ campaignId, chainId, onMessage }: CheckWh
   return (
     <div className="info-card">
       <h3 className="text-lg font-bold text-foreground mb-4">Check Whitelist</h3>
-      <p className="text-muted-foreground text-sm mb-4">
-        Enter an address to check if it is in the whitelist for campaign #{campaignId}
-      </p>
 
       <div className="space-y-4">
         {connectedAddress && (

@@ -1,15 +1,21 @@
 "use client";
 
-import { use, useMemo, useState } from "react";
+import { use, useMemo, useState, useEffect } from "react";
 import { useFhevm } from "@/lib/hooks";
 import { CheckWhitelistPublic } from "@/components/features/veil/CheckWhitelistPublic";
 import Link from "next/link";
 import WalletButton from "@/components/common/WalletButton/index";
+import useContract from "@/lib/hooks/useContract";
+import { VEIL_WHITELIST_CONTRACT_ADDRESSES } from "@/web3/core/constants/veil";
+import VeilWhitelistABI from "@/web3/abis/VeilWhitelist.json";
+import type { VeilWhitelist } from "@/web3/contracts";
 
 export default function VeilCampaignCheckPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const campaignId = useMemo(() => Number(resolvedParams.id), [resolvedParams.id]);
   const [message, setMessage] = useState<string>("");
+  const [campaignName, setCampaignName] = useState<string>("");
+  const [isLoadingCampaignName, setIsLoadingCampaignName] = useState(false);
 
   const { status: fhevmStatus, initialize: initializeFhevm, error: fhevmError } = useFhevm();
 
@@ -18,6 +24,33 @@ export default function VeilCampaignCheckPage({ params }: { params: Promise<{ id
   }
 
   const targetChainId = 11155111;
+  const contractAddress = VEIL_WHITELIST_CONTRACT_ADDRESSES[targetChainId as keyof typeof VEIL_WHITELIST_CONTRACT_ADDRESSES];
+  const readContract = useContract<VeilWhitelist>(contractAddress, VeilWhitelistABI, false, targetChainId);
+
+  useEffect(() => {
+    const loadCampaignName = async () => {
+      if (!readContract || !Number.isFinite(campaignId) || campaignId <= 0) {
+        return;
+      }
+
+      setIsLoadingCampaignName(true);
+      try {
+        const campaignInfo = await readContract.getCampaignInfo(campaignId);
+        if (campaignInfo.exists) {
+          setCampaignName(campaignInfo.name);
+        } else {
+          setCampaignName("");
+        }
+      } catch (error) {
+        console.error("Failed to load campaign name:", error);
+        setCampaignName("");
+      } finally {
+        setIsLoadingCampaignName(false);
+      }
+    };
+
+    loadCampaignName();
+  }, [readContract, campaignId]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,7 +108,25 @@ export default function VeilCampaignCheckPage({ params }: { params: Promise<{ id
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Campaign #{campaignId}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+            {isLoadingCampaignName ? (
+              <span className="flex items-center gap-2">
+                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Loading...
+              </span>
+            ) : campaignName ? (
+              campaignName
+            ) : (
+              `Campaign #${campaignId}`
+            )}
+          </h1>
           <p className="text-muted-foreground">Check whitelist for this campaign</p>
         </div>
 
